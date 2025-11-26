@@ -1,0 +1,36 @@
+name: ai_automation_thesis
+channels:
+  - defaults
+  - conda-forge
+dependencies:
+  - python=3.10
+  - pip
+  - pip:
+    # Core PySpark
+    - pyspark==3.5.0
+    
+    # Data manipulation
+    - pandas==2.1.4
+    - numpy==1.26.4
+    - pyarrow==14.0.1
+    
+    # Machine Learning
+    - scikit-learn==1.3.2
+    
+    # Visualization
+    - matplotlib==3.8.2
+    - seaborn==0.13.0
+    - plotly==5.18.0
+    
+    # Jupyter
+    - jupyter==1.0.0
+    - notebook==7.0.6
+    - ipykernel==6.27.1
+    - ipywidgets==8.1.1
+    
+    # Additional utilities
+    - openpyxl==3.1.2
+    - xlrd==2.0.1
+    - requests==2.31.0
+    - beautifulsoup4==4.12.2
+    - lxml==4.9.3

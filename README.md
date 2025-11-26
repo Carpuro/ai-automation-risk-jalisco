@@ -99,6 +99,10 @@ jupyter notebook notebooks/automation_risk_analysis.ipynb
 pyspark-ai-automation-thesis/
 │
 ├── 📄 README.md
+├── 📄 QUICKSTART.md 
+├── 📄 LICENSE (MIT)
+├── 📄 CONTRIBUTING.md
+├── 📄 .gitignore 
 ├── 📄 environment.yml
 ├── 📄 requirements.txt
 ├── 📄 verify_setup.py
@@ -115,9 +119,21 @@ pyspark-ai-automation-thesis/
 │   └── main.py
 │
 ├── 📁 data/
-│   ├── raw/              # Datos originales
-│   ├── processed/        # Datos procesados
-│   └── external/         # Datos externos
+│   ├── sample/
+│   │   ├── occupations_sample.csv  # Datos de muestra para pruebas
+|   |   ├── .gitkeep   
+│   │   └── README.md  
+│   ├── raw/                        # Datos originales
+│   │   ├── onet_occupations.csv
+│   │   ├── enoe_jalisco.csv
+│   │   ├── .gitkeep         
+│   │   └── README.md
+│   ├── mappings/
+│   │   ├── soc_sinco_mapping.csv   # Mapeo SOC a SINCO
+|   |   ├── .gitkeep
+│   │   └── README.md           
+│   ├── processed/                  # Datos procesados
+│   └── external/                   # Datos externos
 │
 ├── 📁 outputs/
 │   ├── models/           # Modelos entrenados
