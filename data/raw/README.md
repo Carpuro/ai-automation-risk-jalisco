@@ -1,125 +1,96 @@
-# Mapeos de Clasificación de Ocupaciones
+# Datos Crudos (Raw Data)
 
-Este directorio contiene archivos de mapeo entre sistemas de clasificación de ocupaciones.
+Este directorio debe contener los datos originales sin procesar.
 
-## 📁 Archivos
+## 📥 Datos Requeridos
 
-### soc_sinco_mapping.csv
+### 1. O*NET Database
 
-Mapeo entre **SOC (USA)** y **SINCO (México)**.
+Descargar desde: https://www.onetcenter.org/database.html
 
-**Sistemas de clasificación:**
-- **SOC** (Standard Occupational Classification) - Estados Unidos
-- **SINCO** (Sistema Nacional de Clasificación de Ocupaciones) - México
-
-**Columnas:**
-- `soc_code` - Código SOC de 8 dígitos (ej. "15-1211.00")
-- `soc_title` - Título de la ocupación en SOC
-- `sinco_code` - Código SINCO de 4 dígitos (ej. "2121")
-- `sinco_title` - Título de la ocupación en SINCO
-
-**Tamaño:** 60 mapeos
-
-**Uso:**
-```python
-import pandas as pd
-
-mapping = pd.read_csv('data/mappings/soc_sinco_mapping.csv')
-
-# Buscar equivalente SINCO para un código SOC
-soc_code = '15-1211.00'
-sinco_equiv = mapping[mapping['soc_code'] == soc_code]
-print(sinco_equiv)
+**Archivos necesarios:**
+```
+data/raw/onet/
+├── Occupation Data.txt
+├── Skills.txt
+├── Abilities.txt
+├── Work Activities.txt
+├── Work Context.txt
+└── Knowledge.txt
 ```
 
-## 🌐 Fuentes
+**Formato:** Tab-separated values (TSV)  
+**Encoding:** UTF-8
 
-### O*NET Database (SOC)
-- **URL:** https://www.onetcenter.org/
-- **Versión:** 28.2 (2024)
-- **Mantenido por:** U.S. Department of Labor
-- **Actualización:** Anual
+### 2. INEGI ENOE - Jalisco
 
-### INEGI SINCO (México)
-- **URL:** https://www.inegi.org.mx/app/scian/
-- **Versión:** 2011 (vigente)
-- **Mantenido por:** INEGI
-- **Cobertura:** México
+Descargar desde: https://www.inegi.org.mx/programas/enoe/
 
-## ⚠️ Limitaciones
-
-Este mapeo es **simplificado** y cubre solo ocupaciones comunes. Para un mapeo completo:
-
-1. **Oficial INEGI:** Consultar tablas de correspondencia oficiales
-2. **O*NET-SOC:** Usar crosswalks oficiales
-3. **Validación manual:** Requerida para casos específicos
-
-## 📊 Estructura de Códigos
-
-### SOC (8 dígitos)
+**Archivo:**
 ```
-XX-XXXX.XX
-│  │    └─ Ocupación detallada (00-99)
-│  └────── Grupo de ocupaciones (4 dígitos)
-└───────── Grupo mayor (2 dígitos)
+data/raw/enoe_jalisco.csv
 ```
 
-Ejemplos:
-- `15-1211.00` - Computer Systems Analysts
-- `29-1141.00` - Registered Nurses
-- `41-2011.00` - Cashiers
+**Filtrar por:**
+- `ent` = 14 (Jalisco)
+- Trimestre más reciente
 
-### SINCO (4 dígitos)
+**Columnas clave:**
+- `clase2` - Código SINCO
+- `pos_ocu` - Posición en la ocupación
+- `ingocup` - Ingreso por ocupación
+- `nivel` - Nivel educativo
+
+### 3. Estudios de Automatización (Opcional)
+
 ```
-XXXX
-││└└── Ocupación específica
-│└──── Subgrupo
-└───── Grupo principal
+data/raw/frey_osborne_2013.csv
+data/raw/mckinsey_automation.csv
 ```
 
-Ejemplos:
-- `2121` - Analistas de sistemas
-- `3221` - Enfermeras generales
-- `4211` - Cajeros
+## ⚠️ Importante
 
-## 🔄 Actualizar Mapeo
+- **NO subir** estos archivos a Git (están en `.gitignore`)
+- Son archivos grandes (>100MB en algunos casos)
+- Descargar localmente para cada usuario
+- Verificar licencias de uso
 
-Para agregar más mapeos:
+## 📝 Instrucciones de Descarga
+
+### O*NET Database
+
+1. Ir a https://www.onetcenter.org/database.html
+2. Seleccionar "Download Database"
+3. Elegir formato "Tab-Delimited Text"
+4. Descargar y extraer en `data/raw/onet/`
+
+### ENOE INEGI
+
+1. Ir a https://www.inegi.org.mx/programas/enoe/
+2. Seleccionar "Microdatos"
+3. Descargar trimestre más reciente
+4. Filtrar registros donde `ent = 14` (Jalisco)
+5. Guardar como `data/raw/enoe_jalisco.csv`
+
+## 🔍 Validación
+
+Después de descargar, verificar con:
 
 ```python
-import pandas as pd
+import os
 
-# Cargar mapeo existente
-mapping = pd.read_csv('data/mappings/soc_sinco_mapping.csv')
+required_files = [
+    'data/raw/onet/Occupation Data.txt',
+    'data/raw/enoe_jalisco.csv'
+]
 
-# Agregar nuevos mapeos
-new_mapping = pd.DataFrame({
-    'soc_code': ['XX-XXXX.XX'],
-    'soc_title': ['Título SOC'],
-    'sinco_code': ['XXXX'],
-    'sinco_title': ['Título SINCO']
-})
-
-# Combinar y guardar
-updated_mapping = pd.concat([mapping, new_mapping], ignore_index=True)
-updated_mapping.to_csv('data/mappings/soc_sinco_mapping.csv', index=False)
+for file in required_files:
+    if os.path.exists(file):
+        print(f"✓ {file}")
+    else:
+        print(f"✗ {file} - FALTA")
 ```
-
-## 📚 Referencias
-
-1. **O*NET OnLine:** https://www.onetonline.org/
-2. **INEGI SINCO:** https://www.inegi.org.mx/contenidos/productos/prod_serv/contenidos/espanol/bvinegi/productos/nueva_estruc/702825198701.pdf
-3. **BLS SOC:** https://www.bls.gov/soc/
-
-## 🤝 Contribuir
-
-Si tienes correcciones o mejoras al mapeo, por favor:
-1. Verifica con fuentes oficiales
-2. Abre un issue
-3. Envía un PR con la actualización
 
 ---
 
-**Última actualización:** Noviembre 2025  
-**Autor:** Carlos Pulido Rosas  
-**Versión:** 1.0
+**Nota:** Este directorio contiene datos originales **inmutables**. No modificar archivos aquí, usar `data/processed/` para datos transformados.

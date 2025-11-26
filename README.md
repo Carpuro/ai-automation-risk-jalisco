@@ -120,20 +120,19 @@ pyspark-ai-automation-thesis/
 │
 ├── 📁 data/
 │   ├── sample/
-│   │   ├── occupations_sample.csv  # Datos de muestra para pruebas
-|   |   ├── .gitkeep   
+│   │   ├── occupations_sample.csv  # Datos de muestra para pruebas  
 │   │   └── README.md  
 │   ├── raw/                        # Datos originales
 │   │   ├── onet_occupations.csv
-│   │   ├── enoe_jalisco.csv
-│   │   ├── .gitkeep         
+│   │   ├── enoe_jalisco.csv      
 │   │   └── README.md
 │   ├── mappings/
 │   │   ├── soc_sinco_mapping.csv   # Mapeo SOC a SINCO
-|   |   ├── .gitkeep
 │   │   └── README.md           
 │   ├── processed/                  # Datos procesados
+│   │   └── README.md
 │   └── external/                   # Datos externos
+│   │   └── README.md
 │
 ├── 📁 outputs/
 │   ├── models/           # Modelos entrenados
