@@ -1,4 +1,4 @@
-# 🤖 Análisis de Riesgo de Automatización Laboral con PySpark
+# Análisis de Riesgo de Automatización Laboral con PySpark
 
 ## Modelo Predictivo de Sustitución Laboral por IA - Jalisco 2025-2030
 
