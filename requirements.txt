@@ -1,3 +1,8 @@
+# Python dependencies for PySpark data analysis and machine learning
+
+# Python version
+python>=3.8
+
 # Core PySpark
 pyspark==3.5.0
 
