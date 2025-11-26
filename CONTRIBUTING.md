@@ -1,6 +1,6 @@
 # Guía de Contribución
 
-¡Gracias por tu interés en contribuir al proyecto de Análisis de Riesgo de Automatización Laboral! 🎉
+¡Gracias por tu interés en contribuir al proyecto de Análisis de Riesgo de Automatización Laboral! 
 
 ## 📋 Cómo Contribuir
 
@@ -9,7 +9,7 @@
 1. Haz fork del repositorio
 2. Clona tu fork localmente:
 ```bash
-git clone https://github.com/TU-USUARIO/ai-automation-risk-jalisco.git
+git clone https://github.com/Carpuro/ai-automation-risk-jalisco.git
 cd ai-automation-risk-jalisco
 ```
 
