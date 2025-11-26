@@ -18,7 +18,7 @@ src/
 
 ## 📦 Módulos
 
-### 1. data_loader.py
+### 1.[data_loader.py]
 
 **Propósito:** Carga de datos desde múltiples fuentes.
 
@@ -440,8 +440,9 @@ pip install "numpy<2.0" --force-reinstall
 
 ### Documentación del Proyecto:
 - [README.md](../README.md) - Visión general
-- [METHODOLOGY.md](../docs/METHODOLOGY.md) - Metodología completa
 - [ANALYSIS_GUIDE.md](../docs/ANALYSIS_GUIDE.md) - Guía paso a paso
+- [DATA_SOURCES.md](../docs/DATA_SOURCES.md) - Fuentes de datos
+- [METHODOLOGY.md](../docs/METHODOLOGY.md) - Metodología completa
 
 ### Referencias Externas:
 - **PySpark:** https://spark.apache.org/docs/latest/api/python/
