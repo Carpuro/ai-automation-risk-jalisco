@@ -6,9 +6,9 @@ Este directorio contiene todos los módulos Python del proyecto.
 
 ```
 src/
+├── automation_analyzer.py   # Análisis de riesgo de automatización
 ├── data_loader.py           # Carga de datos (O*NET, ENOE, simulados)
 ├── data_preprocessing.py    # Limpieza y preprocesamiento
-├── automation_analyzer.py   # Análisis de riesgo de automatización
 ├── feature_engineering.py   # Creación de features
 ├── visualizations.py        # Generación de gráficos
 └── main.py                  # Script ejecutable principal
@@ -18,7 +18,7 @@ src/
 
 ## 📦 Módulos
 
-### 1. data_loader.py (8 KB)
+### 1. data_loader.py
 
 **Propósito:** Carga de datos desde múltiples fuentes.
 
@@ -48,7 +48,7 @@ print(f"Dataset cargado: {df.count()} ocupaciones")
 
 ---
 
-### 2. data_preprocessing.py (10 KB)
+### 2. data_preprocessing.py
 
 **Propósito:** Limpieza y validación de datos.
 
@@ -79,7 +79,7 @@ print(f"Datos limpios: {df_clean.shape}")
 
 ---
 
-### 3. automation_analyzer.py (18 KB) ⭐ CORE
+### 3. automation_analyzer.py ⭐ CORE
 
 **Propósito:** Análisis de riesgo de automatización laboral.
 
@@ -124,7 +124,7 @@ print(df_risk['risk_category'].value_counts())
 
 ---
 
-### 4. feature_engineering.py (16 KB)
+### 4. feature_engineering.py
 
 **Propósito:** Creación de features derivados para modelado.
 
@@ -165,7 +165,7 @@ print(f"Features creados: {df_features.shape[1]} columnas")
 
 ---
 
-### 5. visualizations.py (17 KB)
+### 5. visualizations.py
 
 **Propósito:** Generación de visualizaciones del análisis.
 
@@ -206,7 +206,7 @@ print("✓ Dashboard generado en outputs/visualizations/")
 
 ---
 
-### 6. main.py (10 KB) 🚀
+### 6. main.py 🚀
 
 **Propósito:** Script ejecutable principal - Punto de entrada del proyecto.
 
