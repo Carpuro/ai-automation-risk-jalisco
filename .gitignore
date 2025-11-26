@@ -1,0 +1,205 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual environments
+venv/
+ENV/
+env/
+.venv
+
+# Jupyter Notebook
+.ipynb_checkpoints
+*.ipynb_checkpoints/
+
+# IPython
+profile_default/
+ipython_config.py
+
+# PySpark
+spark-warehouse/
+metastore_db/
+derby.log
+
+# Data files (large files)
+data/raw/*.csv
+data/raw/*.txt
+data/raw/*.parquet
+data/raw/*.json
+data/raw/onet/
+data/raw/enoe/
+data/external/
+
+# Keep sample data
+!data/sample/
+!data/mappings/
+
+# Processed data (can be regenerated)
+data/processed/*.parquet
+data/processed/*.csv
+
+# Output files (can be regenerated)
+outputs/models/*.model
+outputs/models/*.pkl
+outputs/processed/*.parquet
+outputs/visualizations/*.png
+outputs/visualizations/*.html
+outputs/reports/*.txt
+outputs/reports/*.pdf
+
+# Logs
+logs/
+*.log
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Credentials and secrets
+.env
+.env.local
+credentials.json
+config/secrets.yml
+*.pem
+*.key
+
+# Archives
+*.zip
+*.tar.gz
+*.rar
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# Reports (large PDFs)
+*.pdf
+
+# Excel files (if large)
+data/raw/*.xlsx
+data/raw/*.xls
+
+# Backup files
+*.bak
+*.backup
+*~
+
+# Windows specific
+desktop.ini
+
+# Mac specific
+.AppleDouble
+.LSOverride
+
+# PyCharm
+.idea/
+
+# VS Code
+.vscode/
+*.code-workspace
+
+# Spyder
+.spyderproject
+.spyproject
+
+# Rope
+.ropeproject
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Pyre type checker
+.pyre/
+
+# Coverage reports
+htmlcov/
+.tox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
+.pytest_cache/
+
+# Translations
+*.mo
+*.pot
+
+# Django stuff (if applicable)
+*.log
+local_settings.py
+db.sqlite3
+
+# Flask stuff (if applicable)
+instance/
+.webassets-cache
+
+# Scrapy stuff (if applicable)
+.scrapy
+
+# Sphinx documentation
+docs/_build/
+
+# PyBuilder
+target/
+
+# Celery stuff
+celerybeat-schedule
+celerybeat.pid
+
+# SageMath parsed files
+*.sage.py
+
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# mkdocs documentation
+/site
+
+# Jupyter
+.ipynb_checkpoints
+
+# pyenv
+.python-version
