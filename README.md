@@ -108,15 +108,16 @@ pyspark-ai-automation-thesis/
 ├── 📄 verify_setup.py
 │
 ├── 📁 notebooks/
-│   └── automation_risk_analysis.ipynb
+│   └── automation_risk_analysis.ipynb # Notebook principal
 │
 ├── 📁 src/
-│   ├── data_loader.py
-│   ├── data_preprocessing.py
-│   ├── feature_engineering.py
-│   ├── automation_analyzer.py
-│   ├── visualizations.py
-│   └── main.py
+│   ├── data_loader.py           # Carga de datos
+│   ├── data_preprocessing.py    # Preprocesamiento de datos
+│   ├── feature_engineering.py   # Ingeniería de características
+│   ├── automation_analyzer.py   # Análisis de automatización
+│   ├── visualizations.py        # Visualizaciones
+│   ├── main.py                  # Script principal
+│   └── README.md
 │
 ├── 📁 data/
 │   ├── sample/
