@@ -609,8 +609,6 @@ def plot_scatter_matrix(df_ps, save_path=None):
     if save_path:
         fig.write_html(save_path)
         logger.info(f"  ✓ Guardado: {save_path}")
-    else:
-        
 
 
 def plot_scatter_3d(df_ps, save_path=None):
@@ -664,10 +662,6 @@ def plot_scatter_3d(df_ps, save_path=None):
     if save_path:
         fig.write_html(save_path)
         logger.info(f"  ✓ Guardado: {save_path}")
-    else:
-        
-
-
 def plot_kmeans_clustering(df_ps, n_clusters=4, save_path=None):
     """
     Clustering K-Means de ocupaciones según características.
@@ -814,8 +808,6 @@ def plot_kmeans_clustering(df_ps, n_clusters=4, save_path=None):
     if save_path:
         fig.write_html(save_path)
         logger.info(f"  ✓ Guardado: {save_path}")
-    else:
-        
     
     # Calcular estadísticas por cluster
     logger.info(f"\nEstadísticas por Cluster:")
@@ -958,10 +950,6 @@ def plot_pca_visualization(df_ps, save_path=None):
         fig.write_html(save_path)
         logger.info(f"  ✓ Guardado: {save_path}")
         logger.info(f"  Varianza total explicada: {sum(pca.explained_variance_ratio_)*100:.1f}%")
-    else:
-        
-
-
 if __name__ == "__main__":
     print("Visualizations Module")
     print("Este módulo debe ser importado, no ejecutado directamente.")

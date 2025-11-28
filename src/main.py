@@ -140,6 +140,12 @@ Ejemplos de uso:
         help='Saltar entrenamiento de modelo predictivo'
     )
     
+    parser.add_argument(
+        '--auto-download',
+        action='store_true',
+        help='Descargar datos automáticamente si no existen'
+    )
+    
     # Configuración de Spark
     parser.add_argument(
         '--memory',
@@ -166,16 +172,21 @@ def validate_inputs(args):
         True si válido, False en caso contrario
     """
     if args.mode == 'real':
+        # Si auto-download está activado, no validar archivos ahora
+        if args.auto_download:
+            return True
+            
         if not args.occupation_data:
-            logger.error("Modo 'real' requiere --occupation-data")
+            logger.error("Modo 'real' requiere --occupation-data (o usar --auto-download)")
             return False
         
         if not args.employment_data:
-            logger.error("Modo 'real' requiere --employment-data")
+            logger.error("Modo 'real' requiere --employment-data (o usar --auto-download)")
             return False
         
         if not os.path.exists(args.occupation_data):
             logger.error(f"Archivo no encontrado: {args.occupation_data}")
+            logger.info("💡 Usa --auto-download para descargar automáticamente")
             return False
         
         if not os.path.exists(args.employment_data):
@@ -249,10 +260,23 @@ def main():
         elif args.mode == 'real':
             logger.info("Modo: Datos reales")
             
+            # Descargar datos automáticamente si se solicitó
+            if args.auto_download:
+                from data_loader import auto_download_data
+                paths = auto_download_data(force_download=False)
+                
+                # Actualizar rutas si no se proporcionaron
+                if not args.occupation_data:
+                    args.occupation_data = os.path.join(paths['onet_dir'], 'Occupation Data.txt')
+                if not args.employment_data:
+                    args.employment_data = paths['enoe_file']
+            
             # Cargar O*NET
+            logger.info(f"  Cargando O*NET desde: {args.occupation_data}")
             df_onet = load_onet_occupations(spark, args.occupation_data)
             
             # Cargar ENOE
+            logger.info(f"  Cargando ENOE desde: {args.employment_data}")
             df_enoe = load_enoe_jalisco(spark, args.employment_data)
             
             # Integrar (simplificado - en producción usar mapeo SOC-SINCO)
