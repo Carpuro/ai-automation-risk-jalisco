@@ -316,8 +316,8 @@ class AutomationRiskAnalyzer:
         
         df_result['risk_category'] = df_result['automation_risk'].apply(categorize)
         
-        # Estadísticas por categoría
-        counts = df_result['risk_category'].value_counts()
+        # Estadísticas por categoría (convertir a pandas para evitar problemas de iteración)
+        counts = df_result['risk_category'].value_counts().to_pandas()
         logger.info("✓ Categorización completada:")
         for category, count in counts.items():
             pct = (count / len(df_result)) * 100

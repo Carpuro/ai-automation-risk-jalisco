@@ -291,12 +291,22 @@ def create_salary_categories(df_ps):
     df_result = df_ps.copy()
     
     if 'avg_salary_mxn' in df_ps.columns:
-        # Calcular quintiles
-        df_result['salary_category'] = ps.qcut(
-            df_result['avg_salary_mxn'],
-            q=5,
-            labels=['Muy Bajo', 'Bajo', 'Medio', 'Alto', 'Muy Alto']
-        )
+        # Calcular quintiles manualmente (qcut no está implementado en pyspark.pandas)
+        quantiles = df_result['avg_salary_mxn'].quantile([0.2, 0.4, 0.6, 0.8]).to_list()
+        
+        def categorize_salary(salary):
+            if salary <= quantiles[0]:
+                return 'Muy Bajo'
+            elif salary <= quantiles[1]:
+                return 'Bajo'
+            elif salary <= quantiles[2]:
+                return 'Medio'
+            elif salary <= quantiles[3]:
+                return 'Alto'
+            else:
+                return 'Muy Alto'
+        
+        df_result['salary_category'] = df_result['avg_salary_mxn'].apply(categorize_salary)
         logger.info("✓ Categorías salariales creadas (5 quintiles)")
     else:
         logger.warning("Columna 'avg_salary_mxn' no encontrada")

@@ -34,18 +34,27 @@ def analyze_missing_values(df_ps):
     missing_count = df_ps.isnull().sum()
     missing_pct = (missing_count / len(df_ps)) * 100
     
-    missing_df = ps.DataFrame({
-        'Column': missing_count.index,
-        'Missing_Count': missing_count.values,
-        'Missing_Percent': missing_pct.values
+    # Convertir a pandas para crear el DataFrame (evita problemas con Index)
+    missing_count_pd = missing_count.to_pandas()
+    missing_pct_pd = missing_pct.to_pandas()
+    
+    # Crear DataFrame con pandas primero
+    import pandas as pd
+    missing_df_pd = pd.DataFrame({
+        'Column': missing_count_pd.index.tolist(),
+        'Missing_Count': missing_count_pd.values,
+        'Missing_Percent': missing_pct_pd.values
     }).sort_values('Missing_Count', ascending=False)
+    
+    # Convertir de vuelta a pyspark.pandas
+    missing_df = ps.from_pandas(missing_df_pd)
     
     # Filtrar solo columnas con valores faltantes
     missing_df = missing_df[missing_df['Missing_Count'] > 0]
     
     if len(missing_df) > 0:
         logger.info(f"  Columnas con valores faltantes: {len(missing_df)}")
-        logger.info(f"  Total de valores faltantes: {missing_count.sum():,}")
+        logger.info(f"  Total de valores faltantes: {int(missing_count.sum())}")
     else:
         logger.info("  ✓ No hay valores faltantes")
     
@@ -266,8 +275,7 @@ def validate_data_quality(df_ps):
         'total_columns': len(df_ps.columns),
         'missing_values': int(df_ps.isnull().sum().sum()),
         'missing_percent': float((df_ps.isnull().sum().sum() / (len(df_ps) * len(df_ps.columns))) * 100),
-        'duplicates': int(df_ps.duplicated().sum()),
-        'memory_usage_mb': float(df_ps.memory_usage(deep=True).sum() / 1024**2)
+        'duplicates': int(df_ps.duplicated().sum())
     }
     
     # Validaciones específicas

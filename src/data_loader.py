@@ -11,6 +11,12 @@ from pyspark.sql import SparkSession
 from pyspark.sql.functions import col
 import pyspark.pandas as ps
 import logging
+import os
+import sys
+
+# Configurar Python para Spark (crítico en Windows)
+os.environ['PYSPARK_PYTHON'] = sys.executable
+os.environ['PYSPARK_DRIVER_PYTHON'] = sys.executable
 
 # Configurar logging
 logging.basicConfig(level=logging.INFO)
@@ -43,6 +49,9 @@ def create_spark_session(app_name="AI_Automation_Risk_Analysis", memory="8g"):
             .config("spark.sql.execution.arrow.pyspark.enabled", "true") \
             .config("spark.sql.adaptive.skewJoin.enabled", "true") \
             .getOrCreate()
+        
+        # Habilitar operaciones entre diferentes DataFrames (necesario para feature engineering)
+        ps.set_option('compute.ops_on_diff_frames', True)
         
         logger.info(f"✓ Spark Session '{app_name}' creada exitosamente")
         logger.info(f"  Versión de Spark: {spark.version}")
@@ -280,7 +289,8 @@ def get_data_info(df_ps, name="Dataset"):
     logger.info(df_ps.columns[:10].tolist())
     
     logger.info(f"\nTipos de datos (primeras 10):")
-    for col, dtype in list(df_ps.dtypes.items())[:10]:
+    dtypes_dict = dict(df_ps.dtypes.to_pandas()[:10])
+    for col, dtype in dtypes_dict.items():
         logger.info(f"  {col}: {dtype}")
     
     logger.info(f"{'='*80}\n")
