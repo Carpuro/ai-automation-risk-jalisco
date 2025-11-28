@@ -64,7 +64,7 @@ def plot_risk_distribution(df_ps, save_path=None):
         plt.savefig(save_path, dpi=300, bbox_inches='tight')
         logger.info(f"  ✓ Guardado en: {save_path}")
     
-    plt.show()
+    plt.close()
 
 
 def plot_risk_by_sector(df_ps, top_n=15, save_path=None):
@@ -82,15 +82,16 @@ def plot_risk_by_sector(df_ps, top_n=15, save_path=None):
     """
     logger.info(f"Generando gráfico: Riesgo por sector (top {top_n})...")
     
-    # Calcular riesgo promedio por sector
-    sector_risk = df_ps.groupby('sector')['automation_risk'].mean().sort_values(ascending=True).tail(top_n)
+    # Calcular riesgo promedio por sector y convertir a pandas
+    sector_risk = df_ps.groupby('sector')['automation_risk'].mean().sort_values(ascending=True).tail(top_n).to_pandas()
     
     # Colores según nivel de riesgo
     colors = ['red' if x >= 0.70 else 'orange' if x >= 0.30 else 'green' for x in sector_risk.values]
     
     fig, ax = plt.subplots(figsize=(12, 8))
     
-    sector_risk.plot(kind='barh', ax=ax, color=colors, edgecolor='black')
+    # Usar matplotlib directamente con pandas Series
+    sector_risk.plot(kind='barh', ax=ax, color=colors, edgecolor='black', legend=False)
     
     # Líneas de referencia
     ax.axvline(0.70, color='red', linestyle='--', alpha=0.5, linewidth=2, label='Alto Riesgo')
@@ -107,8 +108,9 @@ def plot_risk_by_sector(df_ps, top_n=15, save_path=None):
     if save_path:
         plt.savefig(save_path, dpi=300, bbox_inches='tight')
         logger.info(f"  ✓ Guardado en: {save_path}")
-    
-    plt.show()
+        plt.close()
+    else:
+        plt.close()
 
 
 def plot_salary_vs_risk(df_ps, save_path=None):
@@ -159,7 +161,7 @@ def plot_salary_vs_risk(df_ps, save_path=None):
         fig.write_html(save_path)
         logger.info(f"  ✓ Guardado en: {save_path}")
     
-    fig.show()
+    
 
 
 def plot_education_vs_risk(df_ps, save_path=None):
@@ -215,7 +217,7 @@ def plot_education_vs_risk(df_ps, save_path=None):
         plt.savefig(save_path, dpi=300, bbox_inches='tight')
         logger.info(f"  ✓ Guardado en: {save_path}")
     
-    plt.show()
+    plt.close()
 
 
 def plot_heatmap_sector_education(df_ps, save_path=None):
@@ -263,7 +265,7 @@ def plot_heatmap_sector_education(df_ps, save_path=None):
         plt.savefig(save_path, dpi=300, bbox_inches='tight')
         logger.info(f"  ✓ Guardado en: {save_path}")
     
-    plt.show()
+    plt.close()
 
 
 def plot_treemap_workers_at_risk(df_ps, save_path=None):
@@ -304,7 +306,7 @@ def plot_treemap_workers_at_risk(df_ps, save_path=None):
         fig.write_html(save_path)
         logger.info(f"  ✓ Guardado en: {save_path}")
     
-    fig.show()
+    
 
 
 def plot_temporal_projections(df_ps, save_path=None):
@@ -365,7 +367,7 @@ def plot_temporal_projections(df_ps, save_path=None):
         plt.savefig(save_path, dpi=300, bbox_inches='tight')
         logger.info(f"  ✓ Guardado en: {save_path}")
     
-    plt.show()
+    plt.close()
 
 
 def plot_correlation_matrix(df_ps, save_path=None):
@@ -425,7 +427,7 @@ def plot_correlation_matrix(df_ps, save_path=None):
         plt.savefig(save_path, dpi=300, bbox_inches='tight')
         logger.info(f"  ✓ Guardado en: {save_path}")
     
-    plt.show()
+    plt.close()
 
 
 def plot_top_occupations_at_risk(df_ps, n=20, save_path=None):
@@ -480,12 +482,12 @@ def plot_top_occupations_at_risk(df_ps, n=20, save_path=None):
         plt.savefig(save_path, dpi=300, bbox_inches='tight')
         logger.info(f"  ✓ Guardado en: {save_path}")
     
-    plt.show()
+    plt.close()
 
 
 def create_dashboard(df_ps, output_dir='outputs/visualizations/'):
     """
-    Crea un dashboard completo con todas las visualizaciones.
+    Crea un dashboard completo con TODAS las visualizaciones (14 totales).
     
     Parameters:
     -----------
@@ -495,11 +497,13 @@ def create_dashboard(df_ps, output_dir='outputs/visualizations/'):
         Directorio para guardar visualizaciones
     """
     logger.info("\n" + "="*80)
-    logger.info("GENERANDO DASHBOARD COMPLETO")
+    logger.info("GENERANDO DASHBOARD COMPLETO (14 VISUALIZACIONES)")
     logger.info("="*80 + "\n")
     
     import os
     os.makedirs(output_dir, exist_ok=True)
+    
+    # ========== VISUALIZACIONES BÁSICAS (1-9) ==========
     
     # 1. Distribución de riesgo
     plot_risk_distribution(df_ps, save_path=f'{output_dir}01_risk_distribution.png')
@@ -529,10 +533,433 @@ def create_dashboard(df_ps, output_dir='outputs/visualizations/'):
     # 9. Top ocupaciones
     plot_top_occupations_at_risk(df_ps, save_path=f'{output_dir}09_top_occupations_risk.png')
     
+    # ========== VISUALIZACIONES AVANZADAS (10-14) ==========
+    
     logger.info("\n" + "="*80)
-    logger.info("✓ DASHBOARD COMPLETO GENERADO")
+    logger.info("GENERANDO VISUALIZACIONES AVANZADAS (CLUSTERING Y DISPERSIÓN)")
+    logger.info("="*80 + "\n")
+    
+    # 10. Matriz de dispersión
+    plot_scatter_matrix(df_ps, save_path=f'{output_dir}10_scatter_matrix.html')
+    
+    # 11. Dispersión 3D
+    plot_scatter_3d(df_ps, save_path=f'{output_dir}11_scatter_3d.html')
+    
+    # 12. K-Means clustering
+    plot_kmeans_clustering(df_ps, n_clusters=4, save_path=f'{output_dir}12_kmeans_clustering.html')
+    
+    # 13. Clustering jerárquico
+    plot_hierarchical_clustering(df_ps, save_path=f'{output_dir}13_hierarchical_clustering.png')
+    
+    # 14. PCA
+    plot_pca_visualization(df_ps, save_path=f'{output_dir}14_pca_visualization.html')
+    
+    logger.info("\n" + "="*80)
+    logger.info("✓ DASHBOARD COMPLETO GENERADO (14 VISUALIZACIONES)")
     logger.info("="*80)
     logger.info(f"\nArchivos guardados en: {output_dir}")
+    logger.info(f"\nVisualizaciones básicas: 1-9")
+    logger.info(f"Visualizaciones avanzadas: 10-14")
+
+
+
+def plot_scatter_matrix(df_ps, save_path=None):
+    """
+    Matriz de dispersión para variables clave.
+    
+    Parameters:
+    -----------
+    df_ps : pyspark.pandas.DataFrame
+        DataFrame con variables numéricas
+    save_path : str, optional
+        Ruta para guardar la figura
+    """
+    logger.info("Generando gráfico: Matriz de dispersión...")
+    
+    # Seleccionar variables clave
+    cols = ['routine_index', 'cognitive_demand', 'social_interaction', 
+            'creativity', 'automation_risk']
+    
+    available_cols = [c for c in cols if c in df_ps.columns]
+    
+    if len(available_cols) < 2:
+        logger.warning("No hay suficientes columnas para matriz de dispersión")
+        return
+    
+    # Convertir a pandas para plotly
+    df_plot = df_ps[available_cols + ['risk_category']].to_pandas()
+    
+    # Crear scatter matrix con Plotly
+    fig = px.scatter_matrix(
+        df_plot,
+        dimensions=available_cols,
+        color='risk_category',
+        color_discrete_map={
+            'Alto': '#d62728',
+            'Medio': '#ff7f0e', 
+            'Bajo': '#2ca02c'
+        },
+        title='Matriz de Dispersión - Variables de Automatización',
+        opacity=0.7,
+        height=800
+    )
+    
+    fig.update_traces(diagonal_visible=False, showupperhalf=False)
+    
+    if save_path:
+        fig.write_html(save_path)
+        logger.info(f"  ✓ Guardado: {save_path}")
+    else:
+        
+
+
+def plot_scatter_3d(df_ps, save_path=None):
+    """
+    Gráfico 3D de dispersión: Rutina vs Cognitivo vs Riesgo.
+    
+    Parameters:
+    -----------
+    df_ps : pyspark.pandas.DataFrame
+        DataFrame con columnas necesarias
+    save_path : str, optional
+        Ruta para guardar la figura
+    """
+    logger.info("Generando gráfico: Dispersión 3D...")
+    
+    # Convertir a pandas
+    df_plot = df_ps[['routine_index', 'cognitive_demand', 'automation_risk', 
+                     'risk_category', 'occupation_name']].to_pandas()
+    
+    # Crear scatter 3D
+    fig = px.scatter_3d(
+        df_plot,
+        x='routine_index',
+        y='cognitive_demand',
+        z='automation_risk',
+        color='risk_category',
+        color_discrete_map={
+            'Alto': '#d62728',
+            'Medio': '#ff7f0e',
+            'Bajo': '#2ca02c'
+        },
+        hover_data=['occupation_name'],
+        title='Dispersión 3D: Rutina vs Cognitivo vs Riesgo',
+        labels={
+            'routine_index': 'Índice de Rutinización',
+            'cognitive_demand': 'Demanda Cognitiva',
+            'automation_risk': 'Riesgo de Automatización'
+        },
+        opacity=0.7,
+        height=700
+    )
+    
+    fig.update_layout(
+        scene=dict(
+            xaxis_title='Rutinización',
+            yaxis_title='Cognitivo',
+            zaxis_title='Riesgo'
+        )
+    )
+    
+    if save_path:
+        fig.write_html(save_path)
+        logger.info(f"  ✓ Guardado: {save_path}")
+    else:
+        
+
+
+def plot_kmeans_clustering(df_ps, n_clusters=4, save_path=None):
+    """
+    Clustering K-Means de ocupaciones según características.
+    
+    Parameters:
+    -----------
+    df_ps : pyspark.pandas.DataFrame
+        DataFrame con features
+    n_clusters : int
+        Número de clusters
+    save_path : str, optional
+        Ruta para guardar la figura
+    """
+    logger.info(f"Generando gráfico: K-Means Clustering (k={n_clusters})...")
+    
+    from sklearn.cluster import KMeans
+    from sklearn.preprocessing import StandardScaler
+    
+    # Seleccionar features para clustering
+    features = ['routine_index', 'cognitive_demand', 'social_interaction', 'creativity']
+    available_features = [f for f in features if f in df_ps.columns]
+    
+    if len(available_features) < 2:
+        logger.warning("No hay suficientes features para clustering")
+        return
+    
+    # Convertir a pandas
+    df_plot = df_ps[available_features + ['occupation_name', 'automation_risk']].to_pandas()
+    
+    # Normalizar features
+    scaler = StandardScaler()
+    X_scaled = scaler.fit_transform(df_plot[available_features])
+    
+    # K-Means
+    kmeans = KMeans(n_clusters=n_clusters, random_state=42, n_init=10)
+    df_plot['cluster'] = kmeans.fit_predict(X_scaled)
+    df_plot['cluster'] = df_plot['cluster'].astype(str)
+    
+    # Crear figura con subplots
+    fig = make_subplots(
+        rows=1, cols=2,
+        subplot_titles=('Clusters: Rutina vs Cognitivo', 'Clusters: Social vs Creatividad'),
+        specs=[[{'type': 'scatter'}, {'type': 'scatter'}]]
+    )
+    
+    colors = ['#1f77b4', '#ff7f0e', '#2ca02c', '#d62728', '#9467bd', '#8c564b']
+    
+    for i, cluster_id in enumerate(sorted(df_plot['cluster'].unique())):
+        cluster_data = df_plot[df_plot['cluster'] == cluster_id]
+        
+        # Subplot 1: Rutina vs Cognitivo
+        if 'routine_index' in available_features and 'cognitive_demand' in available_features:
+            fig.add_trace(
+                go.Scatter(
+                    x=cluster_data['routine_index'],
+                    y=cluster_data['cognitive_demand'],
+                    mode='markers',
+                    name=f'Cluster {cluster_id}',
+                    marker=dict(
+                        size=8,
+                        color=colors[i % len(colors)],
+                        opacity=0.7
+                    ),
+                    text=cluster_data['occupation_name'],
+                    hovertemplate='<b>%{text}</b><br>Rutina: %{x:.1f}<br>Cognitivo: %{y:.1f}<extra></extra>'
+                ),
+                row=1, col=1
+            )
+        
+        # Subplot 2: Social vs Creatividad
+        if 'social_interaction' in available_features and 'creativity' in available_features:
+            fig.add_trace(
+                go.Scatter(
+                    x=cluster_data['social_interaction'],
+                    y=cluster_data['creativity'],
+                    mode='markers',
+                    name=f'Cluster {cluster_id}',
+                    marker=dict(
+                        size=8,
+                        color=colors[i % len(colors)],
+                        opacity=0.7
+                    ),
+                    text=cluster_data['occupation_name'],
+                    hovertemplate='<b>%{text}</b><br>Social: %{x:.1f}<br>Creatividad: %{y:.1f}<extra></extra>',
+                    showlegend=False
+                ),
+                row=1, col=2
+            )
+    
+    # Agregar centroides
+    centroids = scaler.inverse_transform(kmeans.cluster_centers_)
+    
+    for i, centroid in enumerate(centroids):
+        if 'routine_index' in available_features and 'cognitive_demand' in available_features:
+            idx_routine = available_features.index('routine_index')
+            idx_cognitive = available_features.index('cognitive_demand')
+            fig.add_trace(
+                go.Scatter(
+                    x=[centroid[idx_routine]],
+                    y=[centroid[idx_cognitive]],
+                    mode='markers',
+                    marker=dict(
+                        size=15,
+                        color=colors[i % len(colors)],
+                        symbol='x',
+                        line=dict(width=2, color='black')
+                    ),
+                    name=f'Centro {i}',
+                    showlegend=False
+                ),
+                row=1, col=1
+            )
+        
+        if 'social_interaction' in available_features and 'creativity' in available_features:
+            idx_social = available_features.index('social_interaction')
+            idx_creativity = available_features.index('creativity')
+            fig.add_trace(
+                go.Scatter(
+                    x=[centroid[idx_social]],
+                    y=[centroid[idx_creativity]],
+                    mode='markers',
+                    marker=dict(
+                        size=15,
+                        color=colors[i % len(colors)],
+                        symbol='x',
+                        line=dict(width=2, color='black')
+                    ),
+                    showlegend=False
+                ),
+                row=1, col=2
+            )
+    
+    fig.update_xaxes(title_text="Índice de Rutinización", row=1, col=1)
+    fig.update_yaxes(title_text="Demanda Cognitiva", row=1, col=1)
+    fig.update_xaxes(title_text="Interacción Social", row=1, col=2)
+    fig.update_yaxes(title_text="Creatividad", row=1, col=2)
+    
+    fig.update_layout(
+        title_text=f'Clustering K-Means de Ocupaciones (k={n_clusters})',
+        height=500,
+        showlegend=True
+    )
+    
+    if save_path:
+        fig.write_html(save_path)
+        logger.info(f"  ✓ Guardado: {save_path}")
+    else:
+        
+    
+    # Calcular estadísticas por cluster
+    logger.info(f"\nEstadísticas por Cluster:")
+    for cluster_id in sorted(df_plot['cluster'].unique()):
+        cluster_data = df_plot[df_plot['cluster'] == cluster_id]
+        avg_risk = cluster_data['automation_risk'].mean()
+        count = len(cluster_data)
+        logger.info(f"  Cluster {cluster_id}: {count} ocupaciones, Riesgo promedio: {avg_risk:.3f}")
+
+
+def plot_hierarchical_clustering(df_ps, save_path=None):
+    """
+    Dendrograma de clustering jerárquico.
+    
+    Parameters:
+    -----------
+    df_ps : pyspark.pandas.DataFrame
+        DataFrame con features
+    save_path : str, optional
+        Ruta para guardar la figura
+    """
+    logger.info("Generando gráfico: Clustering Jerárquico (Dendrograma)...")
+    
+    from scipy.cluster.hierarchy import dendrogram, linkage
+    from sklearn.preprocessing import StandardScaler
+    
+    # Seleccionar features
+    features = ['routine_index', 'cognitive_demand', 'social_interaction', 'creativity']
+    available_features = [f for f in features if f in df_ps.columns]
+    
+    if len(available_features) < 2:
+        logger.warning("No hay suficientes features para clustering")
+        return
+    
+    # Limitar a 50 ocupaciones para visualización clara
+    df_sample = df_ps.sample(n=min(50, len(df_ps)), random_state=42)
+    df_plot = df_sample[available_features + ['occupation_name']].to_pandas()
+    
+    # Normalizar
+    scaler = StandardScaler()
+    X_scaled = scaler.fit_transform(df_plot[available_features])
+    
+    # Clustering jerárquico
+    linkage_matrix = linkage(X_scaled, method='ward')
+    
+    # Crear dendrograma
+    fig, ax = plt.subplots(figsize=(14, 8))
+    
+    dendrogram(
+        linkage_matrix,
+        labels=df_plot['occupation_name'].tolist(),
+        leaf_rotation=90,
+        leaf_font_size=8,
+        ax=ax
+    )
+    
+    ax.set_title('Dendrograma - Clustering Jerárquico de Ocupaciones', fontsize=14, fontweight='bold')
+    ax.set_xlabel('Ocupaciones', fontsize=12)
+    ax.set_ylabel('Distancia Euclidiana', fontsize=12)
+    ax.grid(axis='y', alpha=0.3)
+    
+    plt.tight_layout()
+    
+    if save_path:
+        plt.savefig(save_path, dpi=300, bbox_inches='tight')
+        logger.info(f"  ✓ Guardado: {save_path}")
+    else:
+        plt.close()
+    
+    plt.close()
+
+
+def plot_pca_visualization(df_ps, save_path=None):
+    """
+    Visualización PCA (Análisis de Componentes Principales).
+    
+    Parameters:
+    -----------
+    df_ps : pyspark.pandas.DataFrame
+        DataFrame con features
+    save_path : str, optional
+        Ruta para guardar la figura
+    """
+    logger.info("Generando gráfico: PCA (Componentes Principales)...")
+    
+    from sklearn.decomposition import PCA
+    from sklearn.preprocessing import StandardScaler
+    
+    # Seleccionar features
+    features = ['routine_index', 'cognitive_demand', 'social_interaction', 
+                'creativity', 'education_level', 'avg_salary_mxn']
+    available_features = [f for f in features if f in df_ps.columns]
+    
+    if len(available_features) < 3:
+        logger.warning("No hay suficientes features para PCA")
+        return
+    
+    # Convertir a pandas
+    df_plot = df_ps[available_features + ['occupation_name', 'risk_category', 'automation_risk']].to_pandas()
+    
+    # Normalizar
+    scaler = StandardScaler()
+    X_scaled = scaler.fit_transform(df_plot[available_features])
+    
+    # PCA
+    pca = PCA(n_components=2)
+    X_pca = pca.fit_transform(X_scaled)
+    
+    df_plot['PC1'] = X_pca[:, 0]
+    df_plot['PC2'] = X_pca[:, 1]
+    
+    # Crear gráfico
+    fig = px.scatter(
+        df_plot,
+        x='PC1',
+        y='PC2',
+        color='risk_category',
+        size='automation_risk',
+        hover_data=['occupation_name'],
+        color_discrete_map={
+            'Alto': '#d62728',
+            'Medio': '#ff7f0e',
+            'Bajo': '#2ca02c'
+        },
+        title=f'PCA - Reducción Dimensional<br><sub>Varianza explicada: PC1={pca.explained_variance_ratio_[0]*100:.1f}%, PC2={pca.explained_variance_ratio_[1]*100:.1f}%</sub>',
+        labels={
+            'PC1': f'Componente Principal 1 ({pca.explained_variance_ratio_[0]*100:.1f}%)',
+            'PC2': f'Componente Principal 2 ({pca.explained_variance_ratio_[1]*100:.1f}%)'
+        },
+        opacity=0.7,
+        height=600
+    )
+    
+    fig.update_layout(
+        xaxis_title=f'PC1 ({pca.explained_variance_ratio_[0]*100:.1f}% varianza)',
+        yaxis_title=f'PC2 ({pca.explained_variance_ratio_[1]*100:.1f}% varianza)'
+    )
+    
+    if save_path:
+        fig.write_html(save_path)
+        logger.info(f"  ✓ Guardado: {save_path}")
+        logger.info(f"  Varianza total explicada: {sum(pca.explained_variance_ratio_)*100:.1f}%")
+    else:
+        
 
 
 if __name__ == "__main__":

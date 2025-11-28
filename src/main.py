@@ -15,7 +15,15 @@ import argparse
 import sys
 import os
 import logging
+import warnings
 from datetime import datetime
+
+# Suprimir warnings de PySpark y bibliotecas relacionadas
+warnings.filterwarnings('ignore', category=UserWarning)
+warnings.filterwarnings('ignore', category=FutureWarning)
+warnings.filterwarnings('ignore', category=DeprecationWarning)
+warnings.filterwarnings('ignore', module='pyspark')
+warnings.filterwarnings('ignore', module='py4j')
 
 # Configurar logging
 logging.basicConfig(
@@ -48,9 +56,7 @@ from automation_analyzer import (
     generate_risk_report
 )
 
-from visualizations import (
-    create_dashboard
-)
+from visualizations import create_dashboard
 
 
 def parse_arguments():
@@ -226,6 +232,9 @@ def main():
             memory=args.memory
         )
         
+        # Suprimir logs verbosos de Spark
+        spark.sparkContext.setLogLevel("ERROR")
+        
         # ====================================================================
         # PASO 2: CARGA DE DATOS
         # ====================================================================
@@ -322,6 +331,7 @@ def main():
             logger.info("PASO 6/7: GENERACIÓN DE VISUALIZACIONES")
             logger.info("="*80)
             
+            # Dashboard completo (14 visualizaciones)
             create_dashboard(df_risk, output_dir=output_viz)
             
             logger.info(f"✓ Visualizaciones guardadas en: {output_viz}")
