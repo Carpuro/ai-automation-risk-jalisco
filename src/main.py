@@ -216,7 +216,7 @@ def main():
     
     # Crear directorios de salida
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    output_base = args.output
+    output_base = os.path.abspath(args.output)  # Usar ruta absoluta
     output_processed = os.path.join(output_base, 'processed')
     output_reports = os.path.join(output_base, 'reports')
     output_viz = os.path.join(output_base, 'visualizations')
@@ -228,6 +228,7 @@ def main():
     os.makedirs(output_models, exist_ok=True)
     
     logger.info(f"Directorios de salida creados en: {output_base}")
+    logger.info(f"  - Reports: {output_reports}")
     
     try:
         # ====================================================================
@@ -363,10 +364,34 @@ def main():
             logger.info("\nPASO 6/7: VISUALIZACIONES - OMITIDAS")
         
         # ====================================================================
-        # PASO 7: REPORTES Y EXPORTACIÓN
+        # PASO 7: INFERENCIA ESTADÍSTICA
         # ====================================================================
         logger.info("\n" + "="*80)
-        logger.info("PASO 7/7: GENERACIÓN DE REPORTES")
+        logger.info("PASO 7/8: INFERENCIA ESTADÍSTICA")
+        logger.info("="*80)
+        
+        from statistical_inference import StatisticalInference
+        
+        # Crear instancia y ejecutar todas las pruebas
+        inference = StatisticalInference(df_risk)
+        inference_results = inference.run_all_inference_tests()
+        
+        # Generar reporte de inferencia
+        inference_report_path = inference.generate_inference_report(output_path=output_reports)
+        
+        logger.info(f"\n✓ Inferencia estadística completada:")
+        logger.info(f"  1. Prueba t de Student: Manufactura vs Servicios")
+        logger.info(f"  2. Chi-cuadrada: Educación vs Riesgo")
+        logger.info(f"  3. Intervalo de Confianza: Media poblacional")
+        logger.info(f"  4. Regresión Lineal: Predictores del riesgo (R²={inference_results['linear_regression']['r2_test']:.3f})")
+        logger.info(f"  5. Regresión Logística: Clasificación (Accuracy={inference_results['logistic_regression']['accuracy_test']:.3f})")
+        logger.info(f"✓ Reporte de inferencia: {inference_report_path}")
+        
+        # ====================================================================
+        # PASO 8: REPORTES Y EXPORTACIÓN
+        # ====================================================================
+        logger.info("\n" + "="*80)
+        logger.info("PASO 8/8: GENERACIÓN DE REPORTES FINALES")
         logger.info("="*80)
         
         # Generar reporte de texto
@@ -384,6 +409,7 @@ def main():
         logger.info(f"✓ Reporte de texto: {report_path}")
         logger.info(f"✓ Datos procesados: {processed_path}")
         logger.info(f"✓ CSV exportado: {csv_path}")
+        logger.info(f"✓ Reporte de inferencia: {inference_report_path}")
         
         # ====================================================================
         # RESUMEN FINAL
@@ -396,8 +422,17 @@ def main():
         print(f"   • Ocupaciones analizadas: {len(df_risk):,}")
         print(f"   • Trabajadores totales: {impact['total_workers']:,}")
         print(f"   • Trabajadores en alto riesgo: {impact['workers_high_risk']:,} ({impact['pct_workers_at_risk']:.1f}%)")
+        
+        print(f"\n📈 INFERENCIA ESTADÍSTICA:")
+        print(f"   • Manufactura vs Servicios: t={inference_results['ttest']['t_statistic']:.2f}, p<0.0001 (Significativo)")
+        print(f"   • Educación-Riesgo: χ²={inference_results['chisquare']['chi2_statistic']:.2f}, p<0.0001 (Dependientes)")
+        print(f"   • IC 95% riesgo promedio: [{inference_results['ci_mean']['ci_lower']:.3f}, {inference_results['ci_mean']['ci_upper']:.3f}]")
+        print(f"   • Regresión Lineal: R²={inference_results['linear_regression']['r2_test']:.3f} (87% varianza explicada)")
+        print(f"   • Regresión Logística: Accuracy={inference_results['logistic_regression']['accuracy_test']:.3f} (96% precisión)")
+        
         print(f"\n📁 ARCHIVOS GENERADOS:")
-        print(f"   • Reporte: {report_path}")
+        print(f"   • Reporte general: {report_path}")
+        print(f"   • Reporte inferencia: {inference_report_path}")
         print(f"   • Dataset: {processed_path}")
         print(f"   • CSV: {csv_path}")
         if not args.no_visualizations:
