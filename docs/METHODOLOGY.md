@@ -1,6 +1,6 @@
-# 📚 Metodología para la Actividad Final de Tesis
+# Metodología — Tesis MCD
 
-## Análisis Predictivo del Impacto de la IA en el Mercado Laboral de Jalisco
+## Riesgo de Automatización Laboral por LLMs en Jalisco: más allá de Frey-Osborne
 
 ---
 
@@ -24,29 +24,29 @@
 ## 1. Resumen Ejecutivo
 
 ### Contexto
-La Inteligencia Artificial y la automatización están transformando el mercado laboral global. Este estudio analiza el impacto específico en Jalisco, México, utilizando metodología cuantitativa basada en el modelo Frey-Osborne (2013).
+Los modelos de lenguaje de gran escala (LLMs) han transformado el perfil de riesgo ocupacional de forma que el modelo de Frey-Osborne (2013) no anticipó: las tareas cognitivas no rutinarias basadas en lenguaje — que el modelo original consideraba seguras — son ahora las más expuestas. Esta tesis cuantifica esa brecha y agrega la dimensión económica que determina si la sustitución técnicamente posible también resulta rentable para el mercado.
 
 ### Alcance
-- **Población objetivo:** 5,000 ocupaciones en Jalisco
-- **Período de análisis:** 2025-2030
-- **Metodología:** Modelo predictivo multivariado
-- **Herramientas:** PySpark, Python, Machine Learning
+- **Unidad de análisis:** ocupaciones en Jalisco (SINCO 4 dígitos, ENOE Q3 2024)
+- **Período de proyección:** 2025–2030
+- **Metodología:** modelo predictivo multivariado de cuatro bloques + validación estadística
+- **Herramientas:** Python (pandas, scikit-learn, statsmodels, pygam, shap), PySpark para procesamiento masivo O*NET
 
-### Pregunta de Investigación Principal
-**¿Qué ocupaciones en Jalisco enfrentan mayor riesgo de automatización por IA en los próximos 5 años, y cuáles son los factores determinantes de este riesgo?**
+### Pregunta de Investigación
+**¿En qué medida la exposición específica a LLMs modifica el riesgo de automatización laboral más allá de lo predicho por el modelo de Frey-Osborne, y qué incentivo económico determina que esa sustitución ocurra efectivamente en el mercado laboral de Jalisco?**
 
 ### Hipótesis
-1. Las ocupaciones con alta rutinización y baja demanda cognitiva tienen >70% de riesgo de automatización
-2. La educación superior reduce el riesgo de automatización en >40%
-3. Los sectores de agricultura y manufactura son los más vulnerables
-4. El riesgo de automatización se acelerará exponencialmente post-2027
+1. El GPT Exposure Score (Eloundou et al., 2023) predice riesgo de automatización para ocupaciones cognitivas no rutinarias de forma significativa e independiente del score Frey-Osborne (H1).
+2. El Índice de Rentabilidad de la Automatización (IRA = salario_anual / proxy_costo_capital) modera la relación entre riesgo técnico y adopción efectiva: solo ocupaciones con IRA > 1 muestran presión real de sustitución (H2).
+3. La educación sigue siendo el factor protector dominante, pero su efecto se atenúa en ocupaciones con alta exposición LLM (H3).
+4. Los sectores de agricultura y manufactura mantienen el mayor riesgo Frey-Osborne; ocupaciones de oficina con alto contenido de lenguaje muestran riesgo LLM superior al predicho por el modelo original (H4).
 
 ---
 
 ## 2. Objetivos de la Investigación
 
 ### Objetivo General
-Desarrollar un modelo predictivo que identifique el riesgo de automatización por ocupación en Jalisco y proponga estrategias de mitigación basadas en evidencia.
+Desarrollar un modelo predictivo que cuantifique el riesgo de automatización laboral por LLMs en Jalisco, incorporando tanto la exposición técnica específica a modelos de lenguaje como el incentivo económico que determina la adopción efectiva por parte del mercado.
 
 ### Objetivos Específicos
 
@@ -123,7 +123,38 @@ Usamos enfoque intermedio. Reconocemos que:
 - Pero la automatización parcial sí desplaza empleos
 - Enfoque conservador: riesgo >70% = alta probabilidad de impacto significativo
 
-### 3.2 Factores de Automatización
+### 3.2 Marco de Tareas — Acemoglu & Restrepo (2018, 2019)
+
+**Referencia:** Acemoglu, D., & Restrepo, P. (2018). *The race between man and machine: Implications of technology for growth, factor shares, and employment.* American Economic Review, 108(6), 1488–1542.
+
+**Argumento central:**
+La automatización ocurre cuando el costo de automatizar una tarea es menor que el salario del trabajador que la realiza. No basta con que sea técnicamente posible — debe ser económicamente rentable. El modelo distingue:
+- **Efecto desplazamiento:** la IA sustituye tareas → reduce demanda laboral en esas ocupaciones.
+- **Efecto productividad:** mayor output por unidad → puede aumentar demanda laboral neta si los salarios bajan o la producción escala.
+
+**Implicación para esta tesis:**
+La variable `IRA` (Índice de Rentabilidad de la Automatización) operacionaliza este umbral de decisión de mercado. Ocupaciones con `IRA > 1` (salario anual > costo anualizado de automatización) tienen presión económica real de sustitución, independientemente de su score Frey-Osborne.
+
+### 3.3 LLMs y la inversión del supuesto de Frey-Osborne
+
+**Referencia:** Eloundou, T., Manning, S., Mishkin, P., & Rock, D. (2023). *GPTs are GPTs: An early look at the labor market impact potential of large language models.* arXiv:2303.10130.
+
+**El problema con el modelo original:**
+Frey-Osborne (2013) clasificó las tareas cognitivas no rutinarias como protegidas de la automatización. Ese supuesto era válido para robótica industrial y RPA (automatización de procesos robóticos). Los LLMs lo invalidan:
+
+| Tipo de tarea | Riesgo Frey-Osborne | Riesgo con LLMs |
+|---|---|---|
+| Rutinaria manual | Alto | Alto (sin cambio) |
+| Rutinaria cognitiva | Alto | Alto (sin cambio) |
+| No rutinaria manual | Bajo | Bajo (sin cambio) |
+| **No rutinaria cognitiva de lenguaje** | **Bajo** | **Alto (cambio crítico)** |
+| No rutinaria cognitiva interpersonal | Bajo | Medio |
+
+**Medición:**
+- `gpt_exposure_score` (ζ): proporción de tareas por ocupación donde un LLM provee mejora significativa de desempeño.
+- `ltii` (LLM Task Intensity Index): índice propio construido desde O*NET, calibrado contra ζ de Eloundou.
+
+### 3.4 Factores de Automatización
 
 #### Factor 1: Rutinización (40% peso)
 **Definición:** Grado en que las tareas son repetitivas, predecibles y siguen patrones fijos.
@@ -284,6 +315,38 @@ Todas las ocupaciones formales en Jalisco según SINCO (Sistema Nacional de Clas
 
 **workers_jalisco** (discreta, conteo)
 - Número estimado de trabajadores en Jalisco
+
+#### Bloque 3 — Exposición a LLMs (Phase 2)
+
+**X₅: gpt_exposure_score** (continua, 0–1)
+- Proporción de tareas por ocupación donde un LLM provee mejora significativa de desempeño.
+- Fuente: Eloundou et al. (2023), scores por SOC crosswalkeados a SINCO.
+- Pendiente: tabla de equivalencias SOC–SINCO (INEGI/STPS).
+
+**X₆: ltii** — LLM Task Intensity Index (continua, 0–100)
+- Índice propio construido desde O*NET: pondera items de Information Input, Cognitive Abilities, Written Comprehension e invierte Social Perceptiveness y Manual Dexterity.
+- Fórmula base:
+  ```
+  ltii = w1*information_input + w2*cognitive_abilities + w3*written_comprehension
+         - w4*social_perceptiveness - w5*manual_dexterity
+  ```
+- Pesos `w` calibrados mediante regresión con `gpt_exposure_score` como variable dependiente.
+
+**X₇: aioe** — AI Occupational Exposure Index (continua)
+- Fuente: Felten, Raj & Seamans (2023). Mide exposición a IA en general (no solo LLMs).
+- Rol: variable de control. Permite aislar el efecto LLM-específico (X₅, X₆) del efecto IA-general.
+
+#### Bloque 4 — Incentivo económico (Phase 2)
+
+**X₈: ira** — Índice de Rentabilidad de la Automatización (continua, ratio)
+- Operacionalización del umbral de Acemoglu & Restrepo (2018).
+- Fórmula:
+  ```
+  ira = ingocup_anual / activo_fijo_por_trabajador_amortizado_5_años
+  ```
+- Numerador: `INGOCUP * 12` por ocupación (ENOE).
+- Denominador: activo fijo por trabajador por subsector SCIAN (Censos Económicos INEGI 2019), amortizado a 5 años.
+- Interpretación: IRA > 1 → el mercado tiene incentivo económico para automatizar esa ocupación.
 
 #### Variables Derivadas
 

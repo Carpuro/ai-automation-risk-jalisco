@@ -1,146 +1,113 @@
-# Análisis de Riesgo de Automatización Laboral con PySpark
+# Labor Automation Risk from AI in Jalisco, Mexico
 
-## Modelo Predictivo de Sustitución Laboral por IA - Jalisco 2025-2030
-
-**Autor:** Carlos Pulido Rosas  
-**Institución:** CUCEA - Universidad de Guadalajara  
-**Programa:** Maestría en Ciencias de los Datos  
-**Línea LGAC:** SMART DATA  
-**Fecha:** Junio 2025
+**Thesis — Maestría en Ciencias de los Datos**  
+Carlos Pulido Rosas · CUCEA, Universidad de Guadalajara · 2025–2026
 
 ---
 
-## 📋 Descripción del Proyecto
+## Research Question
 
-Este proyecto implementa un análisis exploratorio y predictivo usando **PySpark** para evaluar el riesgo de sustitución laboral por Inteligencia Artificial en el estado de Jalisco, México.
+> *To what extent does specific exposure to large language models (LLMs) modify occupational automation risk beyond what the Frey-Osborne model predicts, and what economic incentive determines whether that substitution actually occurs in Jalisco's labor market?*
 
-### Objetivo General
-
-Desarrollar un modelo predictivo que identifique ocupaciones con alto riesgo de automatización mediante análisis de características laborales y tendencias socioeconómicas usando Big Data.
+This study moves beyond technical feasibility (Frey-Osborne, 2013) in two directions: (1) it incorporates LLM-specific exposure measures that invert the original model's assumptions about non-routine cognitive tasks, and (2) it introduces an economic incentive variable that determines whether automation is not just possible but profitable for firms — following the task-based framework of Acemoglu & Restrepo (2018).
 
 ---
 
-## 🎯 Objetivos Específicos
+## Hypotheses
 
-1. **Carga y procesamiento** de datos de ocupaciones (ENOE, O*NET, INEGI)
-2. **Análisis exploratorio** de características de automatización
-3. **Identificación de patrones** de riesgo laboral por sector
-4. **Visualización** de tendencias de automatización 2025-2030
-5. **Modelado predictivo** usando Spark MLlib
+1. LLM exposure significantly predicts automation risk for non-routine cognitive occupations, independent of the Frey-Osborne score (H1).
+2. The Automation Profitability Index (IRA: annual wage / automation cost proxy) moderates the relationship between technical risk and actual adoption (H2).
+3. Education level remains the strongest protective factor, but its effect is weaker for language-intensive occupations with high LLM exposure (H3).
+4. Agriculture and manufacturing retain the highest risk; white-collar clerical occupations show higher risk than Frey-Osborne predicted (H4).
 
 ---
 
-## 📊 Fuentes de Datos
+## Variable Structure
 
-### Datos Principales
+### Block 1 — Worker profile (ENOE)
+`education`, `age`, `income (INGOCUP)`, `sector (SCIAN)`, `formality`, `firm size`, `urban/rural`
 
-1. **O*NET Database** (Occupational Information Network)
-   - Características de ocupaciones
-   - Habilidades requeridas
-   - Tareas automatizables
-   - URL: https://www.onetcenter.org/database.html
+### Block 2 — Task profile (O*NET, Phase 1)
+`routine_task_intensity (RTI)`, `frey_osborne_score`, `cognitive_demand`, `social_interaction`, `creativity`
 
-2. **INEGI - ENOE** (Encuesta Nacional de Ocupación y Empleo)
-   - Empleo por ocupación en Jalisco
-   - Datos socioeconómicos
-   - URL: https://www.inegi.org.mx/programas/enoe/
+### Block 3 — LLM exposure (Phase 2)
+`gpt_exposure_score` — Eloundou et al. (2023), crosswalked SOC → SINCO  
+`ltii` — LLM Task Intensity Index, constructed from O*NET items  
+`aioe` — AI Occupational Exposure Index, Felten et al. (2023), used as control  
 
-3. **McKinsey/Frey-Osborne** (Opcional)
-   - Índices de automatización por ocupación
-   - Probabilidades de automatización
+### Block 4 — Economic incentive
+`ira` — Automation Profitability Index: `annual_wage / capital_intensity_proxy`  
+Source: INGOCUP (ENOE) + fixed assets per worker (INEGI Censos Económicos 2019)
 
-### Estructura Esperada de Datos
+---
+
+## Methodology
+
+**Phase 1 (complete):** Frey-Osborne baseline with ENOE Jalisco data. Random Forest R² ≈ 0.75.  
+Key finding: agriculture at highest risk; education is the dominant protective factor (77–81% feature importance).
+
+**Phase 2 (in progress):** Add Blocks 3 and 4. Model specification:
 
 ```
-occupation_id | occupation_name | sector | automation_risk | 
-workers_jalisco | avg_salary | education_level | skills_required |
-task_routine | task_cognitive | task_manual
+automation_risk = f(
+    Block 1: ENOE worker profile,
+    Block 2: O*NET task profile (Frey-Osborne baseline),
+    Block 3: LLM exposure (GPT score + LTII + AIOE),
+    Block 4: IRA economic incentive
+)
 ```
+
+**Statistical validation:**
+- Pearson vs. Spearman correlation — detect non-linearity before model selection
+- Ramsey RESET — test OLS functional form
+- VIF — multicollinearity between education, income, sector
+- Generalized Additive Models (GAM) — non-linear baseline for comparison
+- SHAP values — variable importance interpretation for Random Forest
+- Confirmatory Factor Analysis (CFA) — validate LLM exposure construct
 
 ---
 
-## 🛠️ Tecnologías Utilizadas
+## Data Sources
 
-- **Apache Spark 3.5+** - Procesamiento distribuido
-- **PySpark** - API Python para Spark
-- **pyspark.pandas** - Manipulación de datos
-- **Spark MLlib** - Machine Learning
-- **Matplotlib/Seaborn/Plotly** - Visualizaciones
-
----
-
-## 🚀 Inicio Rápido
-
-### Requisitos Previos
-
-- Python 3.10 o 3.11
-- Conda/Anaconda
-- 8GB RAM mínimo
-
-### Instalación en 3 Pasos
-
-```bash
-# 1. Crear entorno
-conda env create -f environment.yml
-conda activate ai_automation_thesis
-
-# 2. Verificar instalación
-python verify_setup.py
-
-# 3. Ejecutar análisis
-jupyter notebook notebooks/automation_risk_analysis.ipynb
-```
+| Source | Content | Status |
+|---|---|---|
+| ENOE Q3 2024, ent=14 | Jalisco worker microdata | Available |
+| O*NET 28.3 | Occupation task descriptors | Available |
+| SOC → SINCO crosswalk | INEGI equivalence table | Pending |
+| Eloundou et al. (2023) | GPT Exposure Scores by SOC | Available (paper) |
+| Felten et al. (2023) | AIOE by occupation | Available (paper) |
+| Censos Económicos INEGI 2019 | Capital intensity by SCIAN sector | Available |
+| ENAPROCE | Technology adoption rate by state | Available |
 
 ---
 
-## 📁 Estructura del Proyecto
+## Project Structure
 
 ```
-pyspark-ai-automation-thesis/
-│
-├── 📄 README.md
-├── 📄 QUICKSTART.md 
-├── 📄 LICENSE (MIT)
-├── 📄 CONTRIBUTING.md
-├── 📄 .gitignore 
-├── 📄 environment.yml
-├── 📄 requirements.txt
-├── 📄 verify_setup.py
-│
-├── 📁 notebooks/
-│   └── automation_risk_analysis.ipynb # Notebook principal
-│
-├── 📁 src/
-│   ├── automation_analyzer.py   # Análisis de riesgo de automatización
-│   ├── data_loader.py           # Carga de datos (O*NET, ENOE, simulados)
-│   ├── data_preprocessing.py    # Limpieza y preprocesamiento
-│   ├── feature_engineering.py   # Creación de features
-│   ├── visualizations.py        # Generación de gráficos
-│   ├── main.py                  # Script ejecutable principal
-│   └── README.md
-│
-├── 📁 data/
-│   ├── sample/
-│   │   ├── occupations_sample.csv  # Datos de muestra para pruebas  
-│   │   └── README.md  
-│   ├── raw/                        # Datos originales
-│   │   ├── onet_occupations.csv
-│   │   ├── enoe_jalisco.csv      
-│   │   └── README.md
-│   ├── mappings/
-│   │   ├── soc_sinco_mapping.csv   # Mapeo SOC a SINCO
-│   │   └── README.md           
-│   ├── processed/                  # Datos procesados
-│   │   └── README.md
-│   └── external/                   # Datos externos
-│   │   └── README.md
-│
-├── 📁 outputs/
-│   ├── models/           # Modelos entrenados
-│   ├── visualizations/   # Gráficos
-│   └── reports/          # Reportes
-│
-└── 📁 docs/
+ai-automation-risk-jalisco/
+├── README.md
+├── environment.yml
+├── requirements.txt
+├── data/
+│   ├── raw/            — ENOE, O*NET source files
+│   ├── mappings/       — SOC-SINCO crosswalk
+│   ├── processed/      — cleaned, joined datasets
+│   └── sample/         — sample for testing
+├── notebooks/
+│   └── automation_risk_analysis.ipynb
+├── src/
+│   ├── data_loader.py
+│   ├── data_preprocessing.py
+│   ├── feature_engineering.py
+│   ├── automation_analyzer.py
+│   ├── statistical_inference.py
+│   ├── visualizations.py
+│   └── main.py
+├── outputs/
+│   ├── models/
+│   ├── visualizations/
+│   └── reports/
+└── docs/
     ├── METHODOLOGY.md
     ├── DATA_SOURCES.md
     └── ANALYSIS_GUIDE.md
@@ -148,243 +115,48 @@ pyspark-ai-automation-thesis/
 
 ---
 
-## 📈 Análisis Implementados
-
-### 1. Análisis Exploratorio (30%)
-
-- Distribución de ocupaciones por sector
-- Análisis de salarios y empleo
-- Correlación entre variables
-- Estadísticas descriptivas
-
-### 2. Análisis de Riesgo (40%)
-
-- **Riesgo por ocupación** - Probabilidad de automatización
-- **Riesgo por sector** - Impacto sectorial
-- **Riesgo geográfico** - Zonas de Jalisco más afectadas
-- **Análisis temporal** - Proyecciones 2025-2030
-
-### 3. Feature Engineering (20%)
-
-- Índice de automatización compuesto
-- Categorización de habilidades
-- Rutinización de tareas
-- Impacto económico estimado
-
-### 4. Modelado Predictivo (10%)
-
-- Clasificación de riesgo (Alto/Medio/Bajo)
-- Regresión para probabilidad de automatización
-- Clustering de ocupaciones similares
-
----
-
-## 🎨 Visualizaciones Incluidas
-
-1. **Mapa de Calor** - Riesgo por sector y nivel educativo
-2. **Scatter Plot** - Salario vs Riesgo de automatización
-3. **Barras** - Top ocupaciones en riesgo
-4. **Serie Temporal** - Proyección 2025-2030
-5. **Treemap** - Impacto por sector económico
-6. **Red** - Relaciones entre habilidades y automatización
-7. **Boxplot** - Distribución de riesgo por educación
-8. **Mapa Geográfico** - Jalisco por municipio
-
----
-
-## 🔬 Metodología
-
-### Fase 1: Recolección de Datos
-- Descarga de datasets O*NET
-- Extracción datos ENOE Jalisco
-- Integración de fuentes
-
-### Fase 2: Preprocesamiento
-- Limpieza de datos
-- Normalización
-- Manejo de valores faltantes
-- Feature scaling
-
-### Fase 3: Análisis Exploratorio
-- Estadísticas descriptivas
-- Visualizaciones
-- Identificación de patrones
-
-### Fase 4: Feature Engineering
-- Creación de índices
-- Transformaciones
-- Selección de features
-
-### Fase 5: Modelado
-- Entrenamiento modelos
-- Validación
-- Optimización
-
-### Fase 6: Interpretación
-- Análisis de resultados
-- Recomendaciones
-- Visualización de insights
-
----
-
-## 📊 Métricas de Evaluación del Modelo
-
-- **Accuracy** - Precisión general
-- **Precision/Recall** - Por clase de riesgo
-- **F1-Score** - Balance precision/recall
-- **ROC-AUC** - Capacidad discriminativa
-- **RMSE** - Error en predicciones numéricas
-
----
-
-## 🎓 Resultados Esperados
-
-1. **Identificación** de ocupaciones de alto riesgo en Jalisco
-2. **Cuantificación** del impacto laboral por sector
-3. **Proyecciones** de automatización 2025-2030
-4. **Recomendaciones** de política pública
-5. **Modelo predictivo** replicable para otras regiones
-
----
-
-## 📝 Uso del Proyecto
-
-### Análisis Completo (Jupyter Notebook)
-
-```bash
-jupyter notebook notebooks/automation_risk_analysis.ipynb
-```
-
-### Script Automatizado
-
-```bash
-python src/main.py \
-    --occupation-data data/raw/onet_occupations.csv \
-    --employment-data data/raw/enoe_jalisco.csv \
-    --output outputs/results
-```
-
-### Análisis por Módulo
-
-```python
-# Cargar datos
-from src.data_loader import load_occupation_data
-df = load_occupation_data('data/raw/onet_occupations.csv')
-
-# Análisis de riesgo
-from src.automation_analyzer import calculate_automation_risk
-risk_df = calculate_automation_risk(df)
-
-# Visualizar
-from src.visualizations import plot_risk_heatmap
-plot_risk_heatmap(risk_df)
-```
-
----
-
-## 🔧 Configuración del Entorno
-
-### Opción A: Conda (Recomendado)
+## Setup
 
 ```bash
 conda env create -f environment.yml
 conda activate ai_automation_thesis
-```
-
-### Opción B: pip
-
-```bash
-python -m venv venv
-source venv/bin/activate  # Windows: venv\Scripts\activate
-pip install -r requirements.txt
+python verify_setup.py
+jupyter notebook notebooks/automation_risk_analysis.ipynb
 ```
 
 ---
 
-## 📚 Documentación Adicional
+## Current Status
 
-| Documento | Descripción |
-|-----------|-------------|
-| `METHODOLOGY.md` | Metodología detallada |
-| `DATA_SOURCES.md` | Guía de fuentes de datos |
-| `ANALYSIS_GUIDE.md` | Guía de análisis paso a paso |
-| `API_REFERENCE.md` | Referencia de funciones |
-
----
-
-## 🆘 Soporte y Troubleshooting
-
-### Problemas Comunes
-
-**Error: "PyArrow not found"**
-```bash
-pip install pyarrow>=4.0.0
-```
-
-**Error: "NumPy incompatible"**
-```bash
-pip install numpy==1.26.4
-```
-
-**Kernel muere en Jupyter**
-```bash
-# Usar Python 3.10
-conda create -n ai_automation_thesis python=3.10
-```
+- [x] Phase 1: Frey-Osborne baseline (Random Forest R² = 0.75)
+- [x] ENOE Jalisco data processed
+- [x] O*NET task descriptors integrated
+- [ ] SOC-SINCO crosswalk — pending acquisition
+- [ ] LLM exposure scores (Block 3) — pending crosswalk
+- [ ] IRA economic incentive variable (Block 4) — pending Censos Económicos integration
+- [ ] Phase 2 model — pending Blocks 3 and 4
+- [ ] Statistical validation (RESET, VIF, GAM, SHAP, CFA)
 
 ---
 
-## 📞 Contacto
+## Key References
 
-**Carlos Pulido Rosas**  
-📧 carlos.pulido.rosas@gmail.com  
-📱 +52 33 1030 5580  
-🎓 CUCEA - Universidad de Guadalajara  
-🔗 [GitHub](https://github.com/carpuro)
-🔗 [LinkedIn](https://www.linkedin.com/in/carlos-pulido-489700132/)
+Acemoglu, D., & Restrepo, P. (2018). The race between man and machine. *American Economic Review*, 108(6), 1488–1542.
 
----
+Eloundou, T., Manning, S., Mishkin, P., & Rock, D. (2023). GPTs are GPTs: An early look at the labor market impact potential of large language models. *arXiv:2303.10130*.
 
-## 🙏 Referencias
+Felten, E., Raj, M., & Seamans, R. (2023). How will language models use tool use, planning, and reasoning? *SSRN Working Paper*.
 
-1. Frey, C. B., & Osborne, M. A. (2017). *The future of employment*
-2. McKinsey Global Institute (2023). *AI and automation impact*
-3. O*NET Program (2024). *Occupational Information Network*
-4. INEGI (2024). *Encuesta Nacional de Ocupación y Empleo*
+Frey, C. B., & Osborne, M. A. (2017). The future of employment. *Technological Forecasting and Social Change*, 114, 254–280.
+
+Gmyrek, P., Berg, J., & Bescond, D. (2023). *Generative AI and jobs: A global analysis of potential effects on job quantity and quality*. ILO Working Paper 96.
+
+Nedelkoska, L., & Quintini, G. (2018). *Automation, skills use and training*. OECD Social, Employment and Migration Working Papers, No. 202.
 
 ---
 
-## 📄 Licencia
+## Contact
 
-Este proyecto es parte de una tesis de maestría y está disponible para fines académicos y de investigación.
-
----
-
-## ✅ Checklist de Desarrollo
-
-- [x] Configuración del entorno
-- [x] Carga de datos O*NET
-- [ ] Integración datos ENOE
-- [ ] Análisis exploratorio completo
-- [ ] Feature engineering
-- [ ] Modelo predictivo
-- [ ] Visualizaciones interactivas
-- [ ] Documentación completa
-- [ ] Validación de resultados
-- [ ] Presentación de resultados
-
----
-
-## 🎯 Keywords
-
-`PySpark` `Machine Learning` `Automatización Laboral` `Inteligencia Artificial` 
-`Análisis Predictivo` `Big Data` `Jalisco` `Sustitución Laboral` `O*NET` 
-`ENOE` `Data Science` `Spark MLlib` `Tesis` `CUCEA`
-
---- Versión del Documento ---
-
-**Versión:** 1.0  
-**Última actualización:** Noviembre 2025  
-**Estado:** ✅ En desarrollo
-
---- Fin del Documento ---
+Carlos Pulido Rosas · carlos.pulido.rosas@gmail.com  
+CUCEA — Universidad de Guadalajara  
+GitHub: [github.com/carpuro](https://github.com/carpuro)
