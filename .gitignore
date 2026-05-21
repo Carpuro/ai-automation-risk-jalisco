@@ -49,6 +49,7 @@ data/raw/*.parquet
 data/raw/*.json
 data/raw/onet/
 data/raw/enoe/
+data/raw/moravec_index/
 data/external/
 
 # Keep sample data

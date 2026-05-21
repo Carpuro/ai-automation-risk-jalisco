@@ -19,7 +19,7 @@ os.makedirs(PROC, exist_ok=True)
 # ------------------------------------------------------------------
 # 1. Cargar crosswalk ESCO (ISCO-08 <-> SOC)
 # ------------------------------------------------------------------
-esco_path = r'C:\Users\carlo\.claude\projects\C--Users-carlo\f73f4d89-e668-4763-b547-a2ac567d55a6\tool-results\webfetch-1778804035197-bl3wtt.xlsx'
+esco_path = os.path.join(RAW, 'ESCO_to_ONET_SOC_crosswalk.xlsx')
 esco = pd.read_excel(esco_path, header=2)
 esco.columns = ['isco_code', 'isco_title', 'soc_code', 'soc_title']
 esco = esco.dropna(subset=['isco_code', 'soc_code'])
