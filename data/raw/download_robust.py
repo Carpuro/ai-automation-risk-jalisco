@@ -48,6 +48,35 @@ FILES = [
     },
 ]
 
+# ─── INEGI Marco Geoestadistico 2020 — Municipios Jalisco (para mapa) ────────
+# Fuente: sbl-sdsc/mexico-boundaries (parquet con CVE_MUN oficial INEGI)
+# Output: INEGI_Jalisco_municipios.geojson (125 municipios, CVE_ENT=14)
+def download_jalisco_geo():
+    import io
+    from shapely import wkb
+    import geopandas as gpd
+
+    dest = os.path.join(OUT, 'INEGI_Jalisco_municipios.geojson')
+    if os.path.exists(dest):
+        print(f'[ya existe] INEGI_Jalisco_municipios.geojson ({os.path.getsize(dest)/1024:.0f} KB)')
+        return
+
+    print('Descargando INEGI Marco Geoestadistico 2020 (municipios Mexico)...')
+    url = 'https://raw.githubusercontent.com/sbl-sdsc/mexico-boundaries/main/data/mexico_admin2.parquet'
+    import pandas as pd
+    r = requests.get(url, headers={'User-Agent': 'Mozilla/5.0'}, timeout=120, stream=True)
+    r.raise_for_status()
+    df = pd.read_parquet(io.BytesIO(r.content))
+    df['geometry'] = df['geometry'].apply(lambda b: wkb.loads(b) if isinstance(b, (bytes, bytearray)) else b)
+    jal = df[df['CVE_ENT'] == '14'].copy().reset_index(drop=True)
+    gpd.GeoDataFrame(jal, geometry='geometry', crs='EPSG:4326').to_file(dest, driver='GeoJSON')
+    print(f'  [OK] {os.path.getsize(dest)/1024:.0f} KB — {len(jal)} municipios Jalisco con CVE_MUN oficial')
+
+try:
+    download_jalisco_geo()
+except Exception as e:
+    print(f'  [ERROR] INEGI GeoJSON: {e}')
+
 for f in FILES:
     dest = os.path.join(OUT, f['name'])
     if os.path.exists(dest):

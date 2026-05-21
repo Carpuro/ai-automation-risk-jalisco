@@ -50,6 +50,7 @@ data/raw/*.json
 data/raw/onet/
 data/raw/enoe/
 data/raw/moravec_index/
+data/raw/*.geojson
 data/external/
 
 # Keep sample data
