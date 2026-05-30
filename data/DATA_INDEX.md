@@ -7,6 +7,11 @@ Base de datos SQL Server en homelab (localhost:1433 / Tailscale 100.64.0.11:1433
 
 ## Estado actual de la base de datos
 
+> ⚠️ **DESACTUALIZADO.** El estado real de SQL Server (25 tablas, ENOE/O\*NET/índices
+> ya cargados) está documentado en [`docs/SQL_SERVER_SCHEMA.md`](../docs/SQL_SERVER_SCHEMA.md)
+> (verificado 2026-05-30). La tabla siguiente refleja el estado del proyecto de
+> Programación II y se conserva solo como referencia histórica.
+
 | Tabla / Vista | Filas | Estado | Fuente |
 |---|---|---|---|
 | `trabajadores` | 2,000 | ✅ Cargada | ENOE SDEMT Q3 2024 — muestra Jalisco |
@@ -55,33 +60,25 @@ Encuesta Nacional de Ocupación y Empleo, tercer trimestre 2024.
 #### ENOE_COE1T324.csv — Cuestionario de Ocupación y Empleo Parte 1
 - **Filas totales:** 347,258 | **Jalisco:** 11,352 | **Columnas:** 172
 - **En DB:** ❌ No cargado
-- **Variables clave a extraer:**
-  | Variable COE1 | Nombre propuesto | Descripción |
-  |---|---|---|
-  | p1 | tipo_local | Tipo de local: 1=casa, 2=negocio/ofic., 3=vía pública, 4=campo, 5=otro |
-  | p2c | tipo_contrato | 1=indefinido, 2=temporal/proyecto, 3=sin contrato |
-  | p3h | tam_establecimiento_n | Número de trabajadores (continuo, vs categorizado en SDEMT) |
-  | p3i | contrato_escrito | 1=sí, 2=no |
-  | p5b_thrs | horas_semana | Total de horas trabajadas por semana |
-  | p5f1 | cond_exterior | Trabaja al aire libre expuesto al clima |
-  | p5f2 | cond_de_pie | De pie la mayor parte del tiempo |
-  | p5f3 | cond_peso | Levanta o mueve objetos pesados |
-  | p5f4 | cond_repetitivo | Movimientos o acciones repetitivas |
-  | p5f5 | cond_maquinaria | Opera maquinaria fija (tornos, fresadoras) |
-  | p5f6 | cond_transporte | Opera equipo de transporte |
-  | p5f7 | cond_computadora | Usa computadora, smartphone o tableta |
-  | p5f8 | cond_clientes | Atiende o ayuda directamente a clientes |
-  | p5f9 | cond_vigilancia | Protege o vigila personas o bienes |
-  | p5f10 | cond_temperatura | Trabaja a altas temperaturas |
-  | p5f11 | cond_peligroso | Contacto con sustancias peligrosas |
-  | p5f12 | cond_altura | Trabaja en altura |
-  | p5f13 | cond_herramientas | Usa herramientas manuales |
-  | p5f14 | cond_elaborar | Elabora o transforma objetos/productos |
-  | p5f15 | cond_reparacion | Reparación o mantenimiento |
+- **Encoding:** latin-1 (no UTF-8).
 
-  > **Relevancia para la tesis:** las variables p5f son medidas empíricas directas
-  > de las condiciones físicas de trabajo — equivalente observado del RTI de O\*NET.
-  > p5f7 (cond_computadora) reemplaza el `digital_access` generado sintéticamente.
+> ⚠️ **CORRECCIÓN (exploración 2026-05-30):** la batería `p5f` de condiciones
+> físicas NO se recolectó en la oleada Q3 2024 — todas las columnas p5f1–p5f13
+> están ~0% llenas en Jalisco (p5f7 computadora = 0.0%; solo p5f14 = 49%). El
+> supuesto previo de que `p5f7` daría `digital_access` y las p5f darían el RTI
+> empírico **queda descartado**. `digital_access` debe salir de O\*NET, no de ENOE.
+
+- **Variables COE1 realmente usables (fill rate Jalisco):**
+  | Variable COE1 | Nombre propuesto | Fill | Descripción |
+  |---|---|---|---|
+  | p1 | tipo_local | alto | Tipo de local de trabajo |
+  | p5b_thrs | horas_semana | 54% | Total de horas trabajadas por semana |
+  | p5b_tdia | dias_semana | 54% | Días trabajados por semana |
+  | p5c | — | 54% | Horas relacionadas |
+  | (llaves) | — | 100% | ent, con, upm, ... n_ren (join a SDEMT) |
+
+  > **Conclusión:** COE1 aporta horas/días trabajados y las llaves de join.
+  > No aporta el módulo de condiciones físicas esperado.
 
 #### ENOE_COE2T324.csv — COE Parte 2
 - **Filas:** 347,258 | **Jalisco:** 11,352 | **Columnas:** 82
@@ -340,12 +337,15 @@ trabajadores (2,000 sample) ──(id_trabajador)──> vista_riesgo_jalisco
 
 Una vez cargados los datos, se calcularán:
 
-| Variable | Cómo calcular | Reemplaza |
+> ⚠️ Las variables `*_empirico` y `digital_access_real` basadas en p5f de COE1
+> NO son factibles (p5f no se recolectó — ver corrección en sección ENOE COE1).
+> Se sustituyen por las fuentes O\*NET, que sí tienen estos descriptores.
+
+| Variable | Cómo calcular | Reemplaza / fuente |
 |---|---|---|
-| `digital_access_real` | p5f7 de COE1 (usa computadora) | `digital_access` sintético |
-| `rti_empirico` | promedio(p5f1,p5f2,p5f3,p5f4) de COE1 | `rti` de O\*NET |
-| `manual_empirico` | promedio(p5f5,p5f12,p5f13,p5f14,p5f15) | `manual_dexterity` O\*NET |
-| `social_empirico` | p5f8 de COE1 | `social_interaction` O\*NET |
+| `digital_access` | Technology Skills O\*NET por SOC → SINCO | O\*NET (no ENOE) |
+| `rti` / `manual` / `social` | Work Activities + Work Context O\*NET | O\*NET (no ENOE) |
+| `horas_semana` | p5b_thrs de COE1 (54% fill) | ENOE COE1 (sí factible) |
 | `tech_skill_count` | COUNT de Technology Skills por SOC | variable nueva |
 | `hot_tech_count` | COUNT donde hot_technology=1 | variable nueva |
 | `n_tareas` | COUNT de Task Ratings por SOC | granularidad tarea |
