@@ -1,7 +1,7 @@
 # Data Index — ai_automation_risk_jalisco
 
 Base de datos SQL Server en homelab (localhost:1433 / Tailscale 100.64.0.11:1433).
-Última actualización: 2026-05-20.
+Última actualización: 2026-05-30.
 
 ---
 
@@ -152,7 +152,137 @@ Crosswalk a SINCO: vía IDB México 2024 o ISCO-08 (ver sección Crosswalk).
 
 ---
 
-### 3. Archivos procesados
+### 3. INEGI Censos Económicos 2024 — Jalisco (SAIC)
+**Ruta local:** `data/raw/INEGI_CE2024_jalisco_completo.csv`
+**Origen:** SAIC INEGI, consulta 2026-05-24 — Solo entidad 14 Jalisco, 125 municipios, todos los sectores SCIAN.
+**Filas:** 258,616 | **Columnas:** 105 | **Tamaño:** ~129 MB
+
+Archivo definitivo — reemplaza `INEGI_CE2024_activo_fijo_scian_OLD.csv`.
+
+#### Variables clave para la tesis
+
+| Variable | Descripción | Uso |
+|---|---|---|
+| `H001A` | Personal ocupado total | Denominador IRA — todos los trabajadores |
+| `H010A` | Personal remunerado total | Denominador IRA alternativo |
+| `H001B/C` | Personal ocupado hombres/mujeres | Análisis de género |
+| `H101A` | Personal de producción, ventas y servicios | Perfil laboral por sector |
+| `H203A` | Personal administrativo y de dirección | Perfil laboral por sector |
+| `J000A` | Total de remuneraciones | Numerador IRA (costo laboral base) |
+| `J300A` | Contribuciones patronales a seguridad social | Costo laboral completo |
+| `J400A` | Otras prestaciones sociales | Costo laboral completo |
+| `Q000A` | Acervo total de activos fijos | IRA denominador — capital total |
+| `Q000B` | **Depreciación total de activos fijos** | IRA mejorado — amortización real |
+| `Q000C` | Compra y adquisición de activos fijos | Inversión del año — flujo |
+| `Q010A` | Acervo maquinaria y equipo de producción | Capital industrial |
+| `Q400A` | **Acervo equipo de cómputo y periféricos** | Capital tecnológico — indicador de automatización activa |
+| `A131A` | **Valor agregado censal bruto** | IRA robusto — productividad real |
+| `A111A` | Producción bruta total | Contexto económico por sector |
+
+#### IRA mejorado con este archivo
+```
+IRA_base    = J000A / (Q000A / 5)                          # versión original
+IRA_real    = (J000A + J300A + J400A) / Q000B              # costo laboral total / depreciación real
+IRA_tech    = (J000A + J300A + J400A) / Q400A              # costo laboral / capital tecnológico
+```
+
+---
+
+### 4. INEGI PIBE — PIB por Entidad Federativa Jalisco (2003–2024)
+**Ruta local:** `data/raw/INEGI_PIBE_jalisco_2003_2024.xlsx`
+**Origen:** INEGI Sistema de Cuentas Nacionales de México, PIBE base 2018. Descargado 2026-05-24.
+**Filas:** ~510 conceptos | **Años:** 2003–2024 (2024 preliminar) | **Tamaño:** ~0.1 MB
+
+Serie anual del PIB de Jalisco por actividad económica a precios constantes de 2018.
+Hoja principal: `Tabulado` (datos) | `MetaInfo` (metadatos)
+
+#### Variables clave
+
+| Concepto | Descripción | Uso |
+|---|---|---|
+| PIB total Jalisco | `B.1bP` | Contexto macroeconómico |
+| Valor Agregado Bruto | `B.1bV` | Base para participación sectorial |
+| Actividades primarias (11) | Agricultura, ganadería, pesca | Sector de alto IRA, bajo riesgo percibido |
+| Actividades secundarias (21–33) | Minería, manufactura, construcción | Automatización industrial |
+| Actividades terciarias (43–93) | Comercio, servicios, gobierno | Clusters de riesgo medio-alto por LLMs |
+
+#### Uso en la tesis
+
+- **Análisis longitudinal 2003–2024:** evolución del peso sectorial en el PIB vs. riesgo de automatización
+- **Orientación económica de Jalisco:** qué sectores dominan y hacia dónde crece la economía
+- **Contexto H2 (IRA):** sectores con alto PIB + alto IRA = presión real de sustitución
+
+---
+
+### 5. IMSS — Empleo formal histórico Jalisco (vía IIEG)
+**Ruta local:** `data/raw/IMSS_empleo_*.xlsx` y `.zip`
+**Origen:** IIEG Jalisco (DIEEF-IIEG), serie del IMSS. Descargado 2026-05-30.
+**Nota:** el portal `datos.imss.gob.mx` (datos crudos mensuales 1997–2024) estaba caído (HTTP 503); el IIEG republica las series consolidadas en GitHub. Cobertura máxima del IIEG: **2000–2024**. No hay 1997–1999 consolidado.
+
+| Archivo | Cobertura | Descripción |
+|---|---|---|
+| `IMSS_empleo_jalisco_por_sector.xlsx` | ene 2000 – oct 2024 (mensual) | 9 sectores económicos IMSS de Jalisco — serie principal para análisis longitudinal capital/empleo |
+| `IMSS_empleo_jalisco_sector_actividad.xlsx` | dic 2023 – oct 2024 | Por división/grupo/fracción económica (corto plazo, granular) |
+| `IMSS_empleo_jalisco_2015_2023.zip` | 2015–2023 | CSV granular completo (~246 MB descomprimido) |
+| `IMSS_empleo_nacional_por_entidad.xlsx` | 2000–2024 (mensual) | 32 entidades federativas — contexto nacional |
+
+**Uso en la tesis:** análisis longitudinal de sustitución capital/trabajo por sector SCIAN (conecta con H2/IRA y los 5 censos económicos INEGI 2003–2023).
+
+---
+
+### 6. Latinobarómetro — Percepciones IA y empleo LATAM
+**Ruta local:** `data/raw/Latinobarometro_<año>_stata.zip`
+**Origen:** latinobarometro.org (descarga libre, sin login). Formato Stata `.dta`. Descargado 2026-05-30.
+**Oleadas disponibles en rango:** 2017, 2018, 2020, 2023 (no hubo oleada 2019, 2021 ni 2022).
+
+**Uso en la tesis:** contexto de percepciones sobre IA y riesgo laboral en LATAM/México (capítulo introductorio / política pública). Complementa arXiv:2505.08841.
+
+---
+
+### 7. Epoch AI — Capabilities dataset (benchmarks LLM)
+**Ruta local:** `data/raw/epoch_ai_capabilities.zip` + `data/raw/epoch_eci_repo.zip`
+**Origen:** epoch.ai/data (Creative Commons BY). Descargado 2026-05-30.
+**Contenido:** 49 benchmarks (MMLU, GPQA Diamond, MATH Level 5, FrontierMath, AIME, SWE-bench, ARC-AGI, etc.) con score, fecha de release, organización; más `epoch_capabilities_index.csv` (643 modelos, 2021–2026).
+
+**Uso en la tesis:**
+- Insumo del índice **DBOE** (ver sección 8) — capacidad frontier por aplicación y año.
+- Curva de capacidad `c_j(t)` como evidencia del horizonte 2025–2030 (razonamiento matemático 0.00→0.79 en 2022–2026).
+
+---
+
+### 8. DBOE — Dynamic LLM Occupational Exposure (índice propio)
+**Script:** `data/raw/build_dynamic_aioe.py`
+**Salidas:** `data/processed/dynamic_aioe_scores.csv`, `data/processed/sinco_dboe_scores.csv`
+**Construido:** 2026-05-30. Contribución metodológica original de la tesis.
+
+Extensión temporal del AIOE de Felten, Raj & Seamans (2021) usando scores reales de benchmarks LLM (Epoch AI). Reemplaza el `gpt_exposure_score` sintético del Block 3.
+
+**Método (validado):**
+```
+A_k(t)    = Σ_j rel[k,j] · c_j(t)          # exposición de habilidad k en año t
+W_ok      = z_occ(importancia_ok) + z_occ(nivel_ok)
+DBOE_o(t) = Σ_k z_abil(A_k(t)) · W_ok
+```
+- `rel[k,j]` = matriz AIOE Appendix D (52 habilidades × aplicaciones IA).
+- Restringido a 3 aplicaciones LLM: Language Modeling, Reading Comprehension, Abstract Strategy Games (razonamiento/matemáticas).
+- `c_j(t)` = capacidad frontier (máx score entre modelos liberados hasta el año t) promediada por aplicación.
+
+**Validación:**
+- Reproduce el AIOE publicado (Appendix A): **r = 0.942**.
+- Sigue al LM AIOE de Felten: **r = 0.925**.
+
+**Hallazgo clave (H1):** gradiente por SINCO mayor — Profesionistas (z=+0.88) y Directivos (+0.78) más expuestos; Operadores (−1.02) y Elementales (−1.21) al fondo. La exposición LLM se concentra en ocupaciones cognitivas.
+
+**Limitación temporal (reportar abiertamente):** el re-ranking ocupacional 2022→2026 es mínimo (Spearman 0.998). La señal temporal la lleva la curva `c_j(t)`, no el reordenamiento ocupacional. La exposición es estructural y estable, no volátil.
+
+| Archivo | Descripción | Merge |
+|---|---|---|
+| `dynamic_aioe_scores.csv` | 759 SOC × {dboe_2022..2026, dboe_2026_z} | nivel SOC |
+| `sinco_dboe_scores.csv` | 10 grupos SINCO mayores | ✅ vía `c_ocu11c` a ENOE |
+
+---
+
+### 9. Archivos procesados (O*NET base)
 **Ruta local:** `data/processed/`
 
 | Archivo | Descripción | En DB |
