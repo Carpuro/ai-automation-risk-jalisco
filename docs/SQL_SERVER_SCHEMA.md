@@ -65,7 +65,7 @@ Levantado por inspección directa el **2026-05-30**.
 | Tabla | Filas | Contenido |
 |---|---|---|
 | `external_inegi_ce2024` | 95 | CE2024 agregado por sector (unidades, personal_rem, remuneraciones, activo_fijo) |
-| `external_ira_by_sector` | 19 | IRA ya calculado por sector (salario_anual_prom, activo_fijo_amort_5y, ira) |
+| `external_ira_by_sector` | 19 | IRA por sector (archivo CE2024 **viejo**, solo 2023, sin Q000B/Q400A). **Superado** por `external_ira_by_sector_full` (ver datos nuevos) |
 
 ---
 
@@ -75,7 +75,8 @@ Levantado por inspección directa el **2026-05-30**.
 3. `data/raw/build_crosswalk.py` → `sinco_group_scores.csv`, `isco4_onet_scores.csv`
 4. `data/raw/process_external.py` → carga todas las tablas `external_*` + `sinco_aioe_scores` a SQL Server
 5. `data/raw/build_dynamic_aioe.py` → `dynamic_aioe_scores.csv`, `sinco_dboe_scores.csv` (DBOE)
-6. `data/raw/load_new_tables.py` → carga DBOE + IMSS + Latinobarómetro a SQL Server
+6. `data/raw/load_new_tables.py` → carga DBOE + IMSS + Latinobarómetro a SQL Server; integra DBOE en `ocupaciones_onet`
+7. `data/raw/build_ira.py` → `external_ira_by_sector_full` (IRA longitudinal 2003–2023 del CE2024 completo)
 
 > **Gap de procedencia:** el DDL/carga de las tablas núcleo (`trabajadores`,
 > `ocupaciones_onet`), ENOE full y O*NET detalle no está en este repo. Probable
@@ -91,6 +92,7 @@ Levantado por inspección directa el **2026-05-30**.
 | `sinco_dboe_scores` | 10 | DBOE agregado a grupo SINCO mayor |
 | `imss_empleo_sector` | 2,682 | Empleo formal IMSS Jalisco, tidy long (sector, anio, mes, fecha, trabajadores); 9 sectores × ene-2000 a oct-2024. Total Jalisco 1.03M (2000) → 2.05M (2024), con caída COVID en 2020 |
 | `latinobarometro_mx` | 4,800 | Subset México (idenpa=484) × 4 oleadas (2017/18/20/23); cols: year, weight, age, sex, robot_jobs_perception, robot_var, internet_home |
+| `external_ira_by_sector_full` | 95 | IRA recalculado del CE2024 completo — **serie longitudinal sector × año** (19 sectores SCIAN × 5 censos 2003/08/13/18/23). Variantes `ira_base`, `ira_real` (depreciación Q000B), `ira_tech` (cómputo Q400A). Creada por `data/raw/build_ira.py` |
 
 > ⚠️ **Caveat Latinobarómetro:** el ítem de percepción robots/IA-desplazan-empleo
 > fue verificado manualmente por oleada (las etiquetas Stata se truncan a 80 chars
