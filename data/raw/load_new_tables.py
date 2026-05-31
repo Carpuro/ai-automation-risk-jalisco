@@ -193,6 +193,25 @@ latino.to_sql("latinobarometro_mx", engine, if_exists="replace", index=False,
               chunksize=2000)
 print("  [OK] -> latinobarometro_mx")
 
+# ── 5. Integrar DBOE en ocupaciones_onet (no destructivo) ────────────────────
+# Agrega la columna dboe_2026_z (exposicion LLM real, validada r=0.94) sin tocar
+# las columnas Block 3 sinteticas previas (gpt_exposure_score, etc., que estaban
+# invertidas: agricultura salia como la mas expuesta). El join es por SINCO mayor.
+# Nota: vista_riesgo_jalisco enumera columnas explicitamente, asi que NO recoge
+# esta columna automaticamente; exponerla alli queda para el modelo Phase 2.
+print("\n=== 5. Integrar dboe_2026_z en ocupaciones_onet ===")
+_CHK = ("SELECT COUNT(*) FROM INFORMATION_SCHEMA.COLUMNS "
+        "WHERE TABLE_NAME='ocupaciones_onet' AND COLUMN_NAME='dboe_2026_z'")
+_UPD = ("UPDATE o SET o.dboe_2026_z = s.dboe_2026_z FROM ocupaciones_onet o "
+        "JOIN sinco_dboe_scores s "
+        "ON CAST(o.sinco_code AS VARCHAR(2)) = CAST(s.sinco_major AS VARCHAR(2))")
+with engine.begin() as cx:
+    if not cx.execute(text(_CHK)).scalar():
+        cx.execute(text("ALTER TABLE ocupaciones_onet ADD dboe_2026_z FLOAT"))
+        print("  Columna dboe_2026_z agregada")
+    n = cx.execute(text(_UPD)).rowcount
+    print(f"  [OK] {n} filas de ocupaciones_onet actualizadas con DBOE")
+
 # ── Verificacion final ───────────────────────────────────────────────────────
 print("\n=== Tablas cargadas ===")
 with engine.connect() as conn:

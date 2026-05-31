@@ -22,7 +22,7 @@ Levantado por inspección directa el **2026-05-30**.
 | Tabla | Filas | Contenido | Creada por |
 |---|---|---|---|
 | `trabajadores` | 2,000 | Muestra ML (sinco_code, escoacum, ingocup, scian_sector, formalidad, edad, tamanio_empresa, ira, urban_rural) | Programación II `02_insercion.py` (mcd_cucea) — **a confirmar** |
-| `ocupaciones_onet` | 8 | Scores por grupo SINCO con columnas Block 3 placeholder (gpt_exposure_score, moravec_index, dual_factor_score, iceberg_score) | ídem — **a confirmar** |
+| `ocupaciones_onet` | 8 | Scores por grupo SINCO (1,2,3,4,6,7,8,9 — faltan 5 y 0). Columnas Block 3 placeholder sintéticas + `dboe_2026_z` real (ver nota) | ídem + `load_new_tables.py` §5 |
 | `vista_riesgo_jalisco` (vista) | — | JOIN trabajadores + ocupaciones_onet | `03_joins_views.sql` — **a confirmar** |
 
 ### ENOE Q3 2024 (microdatos)
@@ -102,3 +102,17 @@ Levantado por inspección directa el **2026-05-30**.
 >
 > 2017 es de marco social y las escalas difieren entre oleadas → la comparación
 > longitudinal directa requiere armonización (documentar en el capítulo de percepción).
+
+### Integración DBOE → `ocupaciones_onet` (2026-05-31, `load_new_tables.py` §5)
+Se agregó la columna `dboe_2026_z` (exposición LLM real, validada r=0.94) a
+`ocupaciones_onet`, poblada por join SINCO. **No destructivo:** las columnas Block 3
+sintéticas previas se conservan.
+
+> ⚠️ Las columnas Block 3 sintéticas (`gpt_exposure_score`, `moravec_index`,
+> `dual_factor_score`, `iceberg_score`) tenían valores **invertidos** — p.ej.
+> agropecuario salía como la ocupación más expuesta a GPT (0.76) y directivo como
+> la menos (0.20). El `dboe_2026_z` corrige el orden (Profesionista +0.88 →
+> Operador −1.02). Para el modelo Phase 2 usar `dboe_2026_z`, no las sintéticas.
+>
+> `vista_riesgo_jalisco` enumera columnas explícitamente y NO recoge `dboe_2026_z`
+> automáticamente; exponerla en la vista queda pendiente para el modelo Phase 2.
