@@ -22,7 +22,7 @@ Levantado por inspección directa el **2026-05-30**.
 | Tabla | Filas | Contenido | Creada por |
 |---|---|---|---|
 | `trabajadores` | 2,000 | Muestra ML (sinco_code, escoacum, ingocup, scian_sector, formalidad, edad, tamanio_empresa, ira, urban_rural) | Programación II `02_insercion.py` (mcd_cucea) — **a confirmar** |
-| `ocupaciones_onet` | 8 | Scores por grupo SINCO (1,2,3,4,6,7,8,9 — faltan 5 y 0). Columnas Block 3 placeholder sintéticas + `dboe_2026_z` real (ver nota) | ídem + `load_new_tables.py` §5 |
+| `ocupaciones_onet` | 8 | Scores por grupo SINCO (1,2,3,4,6,7,8,9 — faltan 5 y 0). Columnas Block 3 placeholder sintéticas + reales `dboe_2026_z` y `digital_intensity_z` (ver notas) | ídem + `load_new_tables.py` §5 + `build_digital_intensity.py` |
 | `vista_riesgo_jalisco` (vista) | — | JOIN trabajadores + ocupaciones_onet | `03_joins_views.sql` — **a confirmar** |
 
 ### ENOE Q3 2024 (microdatos)
@@ -77,6 +77,7 @@ Levantado por inspección directa el **2026-05-30**.
 5. `data/raw/build_dynamic_aioe.py` → `dynamic_aioe_scores.csv`, `sinco_dboe_scores.csv` (DBOE)
 6. `data/raw/load_new_tables.py` → carga DBOE + IMSS + Latinobarómetro a SQL Server; integra DBOE en `ocupaciones_onet`
 7. `data/raw/build_ira.py` → `external_ira_by_sector_full` (IRA longitudinal 2003–2023 del CE2024 completo)
+8. `data/raw/build_digital_intensity.py` → `sinco_digital_intensity` + columna `ocupaciones_onet.digital_intensity_z`
 
 > **Gap de procedencia:** el DDL/carga de las tablas núcleo (`trabajadores`,
 > `ocupaciones_onet`), ENOE full y O*NET detalle no está en este repo. Probable
@@ -93,6 +94,7 @@ Levantado por inspección directa el **2026-05-30**.
 | `imss_empleo_sector` | 2,682 | Empleo formal IMSS Jalisco, tidy long (sector, anio, mes, fecha, trabajadores); 9 sectores × ene-2000 a oct-2024. Total Jalisco 1.03M (2000) → 2.05M (2024), con caída COVID en 2020 |
 | `latinobarometro_mx` | 4,800 | Subset México (idenpa=484) × 4 oleadas (2017/18/20/23); cols: year, weight, age, sex, robot_jobs_perception, robot_var, internet_home |
 | `external_ira_by_sector_full` | 95 | IRA recalculado del CE2024 completo — **serie longitudinal sector × año** (19 sectores SCIAN × 5 censos 2003/08/13/18/23). Variantes `ira_base`, `ira_real` (depreciación Q000B), `ira_tech` (cómputo Q400A). Creada por `data/raw/build_ira.py` |
+| `sinco_digital_intensity` | 10 | Intensidad digital real por grupo SINCO desde O\*NET Technology Skills (tech_skill_count, hot_tech_count, in_demand_count + z). Reemplaza el `digital_access` sintético. Gradiente: Directivos/Profesionistas (z≈+1.6/+1.8) → Operadores/Elementales (z≈−1.0). Creada por `data/raw/build_digital_intensity.py` |
 
 > ⚠️ **Caveat Latinobarómetro:** el ítem de percepción robots/IA-desplazan-empleo
 > fue verificado manualmente por oleada (las etiquetas Stata se truncan a 80 chars
