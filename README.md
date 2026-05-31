@@ -31,9 +31,12 @@ This study moves beyond technical feasibility (Frey-Osborne, 2013) in two direct
 `routine_task_intensity (RTI)`, `frey_osborne_score`, `cognitive_demand`, `social_interaction`, `creativity`
 
 ### Block 3 — LLM exposure (Phase 2)
-`gpt_exposure_score` — Eloundou et al. (2023), crosswalked SOC → SINCO  
-`ltii` — LLM Task Intensity Index, constructed from O*NET items  
-`aioe` — AI Occupational Exposure Index, Felten et al. (2023), used as control  
+`dboe` — **Dynamic LLM Occupational Exposure** (own contribution): extends Felten's AIOE with real Epoch AI benchmark scores per year. Validated against the published AIOE (r = 0.94). See `data/raw/build_dynamic_aioe.py`.  
+`gpt_exposure_score` — ILO WP140 task-level exposure (2023 + predicted 2025), crosswalked ISCO → SINCO  
+`moravec_index` — Arora et al. (2025), model-agnostic robustness check  
+`anthropic_observed_exposure` — Anthropic Economic Index, observed vs. theoretical  
+`rl_feasibility` — RL learnability index (2030 horizon)  
+`aioe` — AI Occupational Exposure Index, Felten et al. (2021), used as control  
 
 ### Block 4 — Economic incentive
 `ira` — Automation Profitability Index: `annual_wage / capital_intensity_proxy`  
@@ -69,15 +72,24 @@ automation_risk = f(
 
 ## Data Sources
 
+All sources below are downloaded and (except where noted) loaded into SQL Server.
+See [`docs/SQL_SERVER_SCHEMA.md`](docs/SQL_SERVER_SCHEMA.md) for the full DB inventory
+and [`data/DATA_INDEX.md`](data/DATA_INDEX.md) for source details.
+
 | Source | Content | Status |
 |---|---|---|
-| ENOE Q3 2024, ent=14 | Jalisco worker microdata | Available |
-| O*NET 28.3 | Occupation task descriptors | Available |
-| SOC → SINCO crosswalk | INEGI equivalence table | Pending |
-| Eloundou et al. (2023) | GPT Exposure Scores by SOC | Available (paper) |
-| Felten et al. (2023) | AIOE by occupation | Available (paper) |
-| Censos Económicos INEGI 2019 | Capital intensity by SCIAN sector | Available |
-| ENAPROCE | Technology adoption rate by state | Available |
+| ENOE Q3 2024, ent=14 | Jalisco worker microdata (SDEMT 13,839 / COE1) | Loaded |
+| O*NET 28.3 | Occupation task/ability/context descriptors (detail) | Loaded |
+| ESCO ISCO ↔ SOC crosswalk | bridge SINCO → ISCO → SOC | Loaded |
+| ILO WP140 (2025) | task-level GenAI exposure (2023 + predicted 2025) | Loaded |
+| Felten et al. (2021) | AIOE by occupation | Loaded |
+| Arora et al. (2025) Moravec | model-agnostic exposure | Loaded |
+| Anthropic Economic Index | observed exposure by occupation | Loaded |
+| Epoch AI Capabilities | LLM benchmark scores (DBOE input) | Downloaded |
+| INEGI Censos Económicos 2024 | capital/labor by SCIAN + municipio (IRA) | Loaded |
+| INEGI PIBE 2003–2022 | sectoral GDP Jalisco | Downloaded |
+| IMSS (IIEG) 2000–2024 | formal employment by sector, monthly | Loaded |
+| Latinobarómetro 2017–2023 | AI/robot job-displacement perception (Mexico) | Loaded |
 
 ---
 
@@ -128,14 +140,22 @@ jupyter notebook notebooks/automation_risk_analysis.ipynb
 
 ## Current Status
 
+_Last updated: 2026-05-30. DB inventory: [`docs/SQL_SERVER_SCHEMA.md`](docs/SQL_SERVER_SCHEMA.md)._
+
 - [x] Phase 1: Frey-Osborne baseline (Random Forest R² = 0.75)
-- [x] ENOE Jalisco data processed
-- [x] O*NET task descriptors integrated
-- [ ] SOC-SINCO crosswalk — pending acquisition
-- [ ] LLM exposure scores (Block 3) — pending crosswalk
-- [ ] IRA economic incentive variable (Block 4) — pending Censos Económicos integration
-- [ ] Phase 2 model — pending Blocks 3 and 4
+- [x] ENOE Jalisco data processed and loaded (SDEMT 13,839 / COE1 11,352)
+- [x] O*NET descriptors integrated (task ratings, work context, skills, abilities)
+- [x] SINCO → ISCO → SOC crosswalk (ESCO) built and loaded
+- [x] Data collection complete (ENOE, O*NET, INEGI CE2024/PIBE, IMSS, Latinobarómetro, Epoch)
+- [x] Block 3 indices loaded (AIOE, ILO WP140, Moravec, Anthropic, RL feasibility)
+- [x] **DBOE** dynamic LLM-exposure index built and validated (r = 0.94 vs published AIOE)
+- [x] DBOE / IMSS / Latinobarómetro loaded to SQL Server
+- [ ] Feed real DBOE into `ocupaciones_onet.gpt_exposure_score` (currently placeholder)
+- [ ] IRA economic incentive (Block 4) — recompute from CE2024 full file (Q000C/Q400A)
+- [ ] Phase 2 model M1→M4 (hierarchical, incremental F-test)
+- [ ] ENOE COE1 `digital_access` to be sourced from O*NET (p5f not collected in Q3 2024)
 - [ ] Statistical validation (RESET, VIF, GAM, SHAP, CFA)
+- [ ] Port core-table DDL from `mcd_cucea` into this repo for full reproducibility
 
 ---
 
