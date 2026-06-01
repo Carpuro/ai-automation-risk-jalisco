@@ -107,6 +107,31 @@ Levantado por inspección directa el **2026-05-30**.
 > 2017 es de marco social y las escalas difieren entre oleadas → la comparación
 > longitudinal directa requiere armonización (documentar en el capítulo de percepción).
 
+## Tablas de modelado cargadas (2026-05-31) — creadas por `data/raw/load_model_tables.py`
+Consolidación: dejar el server como fuente única antes de buscar el crosswalk SINCO↔ISCO.
+| Tabla | Filas | Grano | Contenido |
+|---|---|---|---|
+| `enoe_jalisco_workers` | 6,147 | trabajador ocupado | **Ocupación SINCO-4 díg granular** (`sinco4`, **340 ocupaciones** distintas) recuperada de COE1 `p3` vía join SDEMT+COE1 por llave de persona. Recupera el grano fino que el `enoe_coe1_jalisco` viejo había perdido (solo traía 11 grupos `c_ocu11c`). Incluye fac_tri, sex, eda, anios_esc, scian, seg_soc, emple7c, ingocup, hrsocup |
+| `crosswalk_isco4_onet_scores` | 436 | ISCO-08 4 díg | features Frey-Osborne derivados de O*NET (cognitive_demand, social, creativity, manual_dexterity, rti, frey_osborne_score); col `sinco_major` VACÍA (gap del puente SINCO↔ISCO) |
+| `crosswalk_onet_scores` | 1,016 | O*NET SOC | scores O*NET por ocupación |
+| `crosswalk_sinco_group_scores` | 10 | SINCO mayor | scores agregados a grupo |
+| `model_exposure_soc` | **667** | SOC 6 díg | **Tabla Nivel-1 consolidada.** Cognitivo: dboe_2026/dboe_2026_z, aioe_score, lm_aioe_score, anthropic_observed_exposure, moravec_auto_w, rl_index_mean (estos 2 son cognitivos, ver corrección abajo). Físico (DEOE, 2026-05-31): phys_manual, phys_machine, phys_vehicle_field, phys_routine, phys_dexterity_bottleneck, embodied_exposure, embodied_exposure_z. Ahora 20 cols. Base del modelo de exposición de 2 ejes |
+| `embodied_exposure_soc` | 759 | SOC 6 díg | **DEOE — Dynamic Embodied Occupational Exposure (núcleo estático).** Índice físico propio desde O*NET (importancia×nivel z, espejo del W_ok del DBOE). 5 subdominios + resumen. Creada por `data/raw/build_embodied_exposure.py` |
+
+> **⚠️ CORRECCIÓN DE CORRELACIONES (2026-05-31, deja obsoleta la nota previa):**
+> Al construir el DEOE se midió que **`moravec_auto_w` y `rl_index_mean` NO son
+> físicos — son cognitivos** (paradoja de Moravec): correlacionan −0.66/−0.72 con
+> trabajo físico real (`phys_manual`) y +0.74/+0.78 con DBOE/AIOE. El viejo
+> "1 factor dominante / físico-cognitivo 0.70-0.78" era artefacto: los 5 índices
+> eran TODOS cognitivos. El **DEOE (`embodied_exposure_z`) es el primer eje físico
+> real**, ortogonal a los cognitivos (r −0.10 a −0.20). DBOE↔AIOE=0.96 sigue válido
+> (colineales). Anthropic_observed sigue siendo el mejor target externo no circular.
+
+> **Pendiente que NO es de datos locales:** puente SINCO↔ISCO-08 (correspondencia
+> oficial INEGI) para conectar `enoe_jalisco_workers.sinco4` (340 occ) con
+> `crosswalk_isco4_onet_scores` (436 ISCO) y `model_exposure_soc` (667 SOC).
+> Único hueco que requiere descargar un dato externo.
+
 ### Integración DBOE → `ocupaciones_onet` (2026-05-31, `load_new_tables.py` §5)
 Se agregó la columna `dboe_2026_z` (exposición LLM real, validada r=0.94) a
 `ocupaciones_onet`, poblada por join SINCO. **No destructivo:** las columnas Block 3
