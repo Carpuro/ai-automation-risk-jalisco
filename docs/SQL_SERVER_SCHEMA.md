@@ -116,7 +116,7 @@ Consolidación: dejar el server como fuente única antes de buscar el crosswalk 
 | `crosswalk_onet_scores` | 1,016 | O*NET SOC | scores O*NET por ocupación |
 | `crosswalk_sinco_group_scores` | 10 | SINCO mayor | scores agregados a grupo |
 | `model_exposure_soc` | **667** | SOC 6 díg | **Tabla Nivel-1 consolidada.** Cognitivo: dboe_2026/dboe_2026_z, aioe_score, lm_aioe_score, anthropic_observed_exposure, moravec_auto_w, rl_index_mean (estos 2 son cognitivos, ver corrección abajo). Físico (DEOE, 2026-05-31): phys_manual, phys_machine, phys_vehicle_field, phys_routine, phys_dexterity_bottleneck, embodied_exposure, embodied_exposure_z. Ahora 20 cols. Base del modelo de exposición de 2 ejes |
-| `embodied_exposure_soc` | 759 | SOC 6 díg | **DEOE — Dynamic Embodied Occupational Exposure (núcleo estático).** Índice físico propio desde O*NET (importancia×nivel z, espejo del W_ok del DBOE). 5 subdominios + resumen. Creada por `data/raw/build_embodied_exposure.py` |
+| `embodied_exposure_soc` | 759 | SOC 6 díg | **DEOE — Dynamic Embodied Occupational Exposure (núcleo estático).** Índice físico propio desde O*NET (importancia×nivel z, espejo del W_ok del DBOE). 5 subdominios (phys_manual, phys_machine, phys_vehicle_field, phys_routine, phys_dexterity; Cronbach α 0.57–0.95) + resumen `embodied_exposure` = **PC1 (63% varianza)**. **Validado convergente: r=+0.76 vs Webb 2020 robot-patent exposure**, ~0 vs AI/AIOE. Creada por `data/raw/build_embodied_exposure.py` |
 
 > **⚠️ CORRECCIÓN DE CORRELACIONES (2026-05-31, deja obsoleta la nota previa):**
 > Al construir el DEOE se midió que **`moravec_auto_w` y `rl_index_mean` NO son

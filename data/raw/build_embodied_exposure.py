@@ -62,7 +62,7 @@ SUBDOMAINS = {
     "phys_vehicle_field": ["operating_vehicles", "outdoors_weather",
                            "open_vehicle", "enclosed_vehicle"],
     "phys_routine": ["repeating_tasks", "repetitive_motions"],
-    "phys_dexterity_bottleneck": ["hands_handle_feel", "cramped_awkward"],
+    "phys_dexterity": ["hands_handle_feel", "cramped_awkward"],
 }
 
 
@@ -130,28 +130,41 @@ def build():
         out[sub] = Fz[items].mean(axis=1)
         print(f"  {sub:28s} a={cronbach_alpha(Fz[items]):.2f}  (k={len(items)})")
 
-    # Summary DEOE: roboticizable physical work minus the manipulation bottleneck
-    roboticizable = out[["phys_manual", "phys_machine",
-                         "phys_vehicle_field", "phys_routine"]].mean(axis=1)
-    out["embodied_exposure"] = z(roboticizable) - out["phys_dexterity_bottleneck"]
-    out["embodied_exposure_z"] = z(out["embodied_exposure"])
+    # Summary DEOE = first principal component of the 5 subdomains.
+    # Empirically (vs Webb 2020 robot patents) ALL subdomains -- including manual
+    # dexterity -- load positively on real robot exposure; the Frey-Osborne (2017)
+    # manipulation "bottleneck" no longer protects from robots. So no hand signs:
+    # PC1 is the data-driven single embodied-exposure factor.
+    subs = list(SUBDOMAINS)
+    S = out[subs].apply(z)
+    Xc = S.values - S.values.mean(axis=0)
+    U, sv, Vt = np.linalg.svd(Xc, full_matrices=False)
+    pc1 = Xc @ Vt[0]
+    if np.corrcoef(pc1, S["phys_manual"])[0] [1] < 0:  # orient: high = more physical
+        pc1, Vt = -pc1, -Vt
+    var_exp = sv[0] ** 2 / (sv ** 2).sum()
+    out["embodied_exposure"] = pc1
+    out["embodied_exposure_z"] = z(pd.Series(pc1, index=out.index))
     out = out.reset_index().rename(columns={"index": "soc6"})
+    print(f"\nPC1 (embodied_exposure): {var_exp:.0%} of variance; loadings:")
+    for s_, w_ in zip(subs, Vt[0]):
+        print(f"    {s_:28s} {w_:+.2f}")
 
-    # --- convergent / discriminant validation -----------------------------
-    c = ENGINE.connect()
-    val = pd.read_sql(
-        "SELECT soc6, dboe_2026_z, aioe_score, anthropic_observed_exposure, "
-        "moravec_auto_w, rl_index_mean FROM model_exposure_soc", c)
-    c.close()
-    v = out.merge(val, on="soc6", how="inner")
-    print(f"\nValidation N (joined to model_exposure_soc): {len(v)}")
-    print("Correlation of embodied_exposure_z with external indices:")
-    print("  CONVERGENT (physical, expect HIGH):")
-    for col in ["moravec_auto_w", "rl_index_mean"]:
-        print(f"    {col:32s} r={v['embodied_exposure_z'].corr(v[col]):+.2f}")
-    print("  DISCRIMINANT (cognitive, expect LOWER):")
-    for col in ["dboe_2026_z", "aioe_score", "anthropic_observed_exposure"]:
-        print(f"    {col:32s} r={v['embodied_exposure_z'].corr(v[col]):+.2f}")
+    # --- convergent / discriminant validation against external benchmarks ---
+    cmp = pd.read_csv(os.path.join(os.path.dirname(__file__),
+                      "moravec_index", "Comparison of Indices.csv"))
+    cmp["soc6"] = cmp["soc6"].astype(str).str.replace("-", "", regex=False).str.zfill(6)
+    v = out.copy()
+    v["soc6n"] = v["soc6"].astype(str).str.replace("-", "", regex=False).str.zfill(6)
+    v = v.merge(cmp.rename(columns={"soc6": "soc6n"}), on="soc6n", how="inner")
+    print(f"\nValidation N (joined to Comparison of Indices): {len(v)}")
+    print("embodied_exposure_z correlations:")
+    print("  CONVERGENT (real robots / manual, expect HIGH +):")
+    for col in ["webb_robot", "routine_manual"]:
+        print(f"    {col:20s} r={v['embodied_exposure_z'].corr(v[col]):+.2f}")
+    print("  DISCRIMINANT (cognitive / AI, expect LOW or -):")
+    for col in ["webb_ai", "webb_software", "felten", "sml", "routine_cognitive"]:
+        print(f"    {col:20s} r={v['embodied_exposure_z'].corr(v[col]):+.2f}")
 
     # --- persist ----------------------------------------------------------
     out.to_sql("embodied_exposure_soc", ENGINE, if_exists="replace", index=False, chunksize=1000)
@@ -162,7 +175,8 @@ def build():
     m = pd.read_sql("SELECT * FROM model_exposure_soc", c)
     c.close()
     emb_cols = [col for col in out.columns if col.startswith("phys_") or col.startswith("embodied_")]
-    m = m[[col for col in m.columns if col not in emb_cols]]  # drop if re-running
+    m = m[[col for col in m.columns  # drop any prior embodied cols if re-running
+           if not (col.startswith("phys_") or col.startswith("embodied_"))]]
     m = m.merge(out[["soc6"] + emb_cols], on="soc6", how="left")
     m.to_sql("model_exposure_soc", ENGINE, if_exists="replace", index=False, chunksize=1000)
     print(f"-> model_exposure_soc updated: {len(m)} rows, {m.shape[1]} cols "
