@@ -134,10 +134,15 @@ Consolidación: dejar el server como fuente única antes de buscar el crosswalk 
 > real**, ortogonal a los cognitivos (r −0.10 a −0.20). DBOE↔AIOE=0.96 sigue válido
 > (colineales). Anthropic_observed sigue siendo el mejor target externo no circular.
 
-> **Pendiente que NO es de datos locales:** puente SINCO↔ISCO-08 (correspondencia
-> oficial INEGI) para conectar `enoe_jalisco_workers.sinco4` (340 occ) con
-> `crosswalk_isco4_onet_scores` (436 ISCO) y `model_exposure_soc` (667 SOC).
-> Único hueco que requiere descargar un dato externo.
+| `crosswalk_sinco_ciuo` | 590 | SINCO-4d → CIUO-08 | Puente SINCO 2011 ↔ ISCO-08 (395 SINCO-4d, 1-a-muchos). De tablas comparativas oficiales INEGI vía paquete `occupationcross`. `build_sinco_crosswalk.py` |
+| `crosswalk_sinco_soc` | 726 | SINCO-4d → SOC | Puente SINCO 2011 ↔ SOC directo (403 SINCO-4d). **SOC es BROAD (term. en 0); unir a `model_exposure_soc.soc6` por broad key (últ díg→0).** `build_sinco_crosswalk.py` |
+
+> **✅ Puente SINCO↔ISCO/SOC RESUELTO (2026-06-07):** era el único hueco externo.
+> Fuente = tablas comparativas oficiales INEGI (`mexico_sinco_tablas_comparativas.xlsx`,
+> del paquete abierto `occupationcross`/Guidowe). Cadena validada
+> enoe_jalisco_workers → crosswalk_sinco_soc (broad) → model_exposure_soc:
+> **89% de trabajadores Jalisco (pond. fac_tri) con DBOE+DEOE**. Hallazgo: Jalisco
+> DBOE −0.38 (debajo en IA cognitiva), DEOE +0.09 (arriba en robots).
 
 ### Integración DBOE → `ocupaciones_onet` (2026-05-31, `load_new_tables.py` §5)
 Se agregó la columna `dboe_2026_z` (exposición LLM real, validada r=0.94) a
