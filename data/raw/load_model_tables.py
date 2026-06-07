@@ -127,8 +127,24 @@ def build_model_exposure_soc():
     return df
 
 
+# ---------------------------------------------------------------------------
+# 6. External index comparison (Webb robot/software/AI, Felten, SML, Frey-Osborne,
+#    Eloundou, routine_*) -- benchmark battery used to validate DBOE/DEOE and EFA.
+# ---------------------------------------------------------------------------
+def load_index_comparison():
+    print("6. external_index_comparison (benchmark battery)")
+    path = os.path.join(RAW, "moravec_index", "Comparison of Indices.csv")
+    if not os.path.exists(path):
+        print(f"  !! missing {path}")
+        return
+    cmp = pd.read_csv(path)
+    cmp["soc6_key"] = cmp["soc6"].astype(str).str.replace("-", "", regex=False).str.zfill(6)
+    load(cmp, "external_index_comparison")
+
+
 if __name__ == "__main__":
     build_enoe_workers()
     load_processed_csvs()
     build_model_exposure_soc()
+    load_index_comparison()
     print("\nDone. Server updated.")

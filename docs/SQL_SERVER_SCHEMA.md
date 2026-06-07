@@ -117,6 +117,13 @@ Consolidación: dejar el server como fuente única antes de buscar el crosswalk 
 | `crosswalk_sinco_group_scores` | 10 | SINCO mayor | scores agregados a grupo |
 | `model_exposure_soc` | **667** | SOC 6 díg | **Tabla Nivel-1 consolidada.** Cognitivo: dboe_2026/dboe_2026_z, aioe_score, lm_aioe_score, anthropic_observed_exposure, moravec_auto_w, rl_index_mean (estos 2 son cognitivos, ver corrección abajo). Físico (DEOE, 2026-05-31): phys_manual, phys_machine, phys_vehicle_field, phys_routine, phys_dexterity_bottleneck, embodied_exposure, embodied_exposure_z. Ahora 20 cols. Base del modelo de exposición de 2 ejes |
 | `embodied_exposure_soc` | 759 | SOC 6 díg | **DEOE — Dynamic Embodied Occupational Exposure (núcleo estático).** Índice físico propio desde O*NET (importancia×nivel z, espejo del W_ok del DBOE). 5 subdominios (phys_manual, phys_machine, phys_vehicle_field, phys_routine, phys_dexterity; Cronbach α 0.57–0.95) + resumen `embodied_exposure` = **PC1 (63% varianza)**. **Validado convergente: r=+0.76 vs Webb 2020 robot-patent exposure**, ~0 vs AI/AIOE. Creada por `data/raw/build_embodied_exposure.py` |
+| `external_index_comparison` | 923 | SOC 6 díg | Batería de benchmarks externos a grano soc6 (col `soc6_key` normalizada): `webb_robot/webb_software/webb_ai`, `felten` (AIOE), `frey_osborne`, `sml`, `eloundou_alpha/beta/gamma`, `routine_manual/routine_cognitive`, + auto_w/pv_w/... de Moravec. Para validar DBOE/DEOE y el EFA. Creada por `load_model_tables.py` §6 |
+
+> **EFA (estructura factorial, `analysis/exposure_factor_structure.py`, 2026-06-07):**
+> 8 índices, N=747, oblimin. **UN factor dominante BIPOLAR** cognitivo(+)↔físico(−):
+> F1 (57% var) = DBOE/RL/Moravec/Anthropic (+) vs DEOE/webb_robot/routine_manual (−);
+> F2 (12%) = solo SML. IA y robots apuntan a ocupaciones OPUESTAS (tesis de Webb
+> confirmada). Moravec/RL confirmados cognitivos (cargan con DBOE).
 
 > **⚠️ CORRECCIÓN DE CORRELACIONES (2026-05-31, deja obsoleta la nota previa):**
 > Al construir el DEOE se midió que **`moravec_auto_w` y `rl_index_mean` NO son
