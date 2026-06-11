@@ -18,6 +18,13 @@ recovery, balanced ~22 pre / 24 post months); robustness window 2017-01+.
 Month FE absorb common shocks; identification is cross-sector. Only 9
 clusters -- HC1 SEs reported with that caveat; read effect sizes, not stars.
 
+INFERENCE UPDATE (permutation_inference.py): with only 8 sectors, the
+analytic p-values below are overconfident. Under permutation inference the
+post x DBOE coefficient has p = 0.255 -- the positive point estimate is NOT
+distinguishable from chance. The honest claim is therefore: no significant
+employment response in EITHER direction post-ChatGPT. Do not quote the
+"grew faster, p<0.001" version.
+
 INTERPRETATION -- "not yet" is not "safe" (the policy window):
   * This test measures one narrow thing: the STOCK of FORMAL jobs at a
     coarse 8-sector grain over ~24 months. Early displacement appears first

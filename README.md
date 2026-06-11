@@ -195,7 +195,7 @@ _Last updated: 2026-06-10._
 - [x] CFA model comparison (two correlated axes ≫ one factor, φ = −0.67)
 - [x] ENDUTIH checked: no AI-use module through the 2024 wave — no Mexican household AI-adoption measure exists yet (documented limitation; watch future waves)
 - [x] Workers-at-risk headline numbers (1.10M above the high-pressure bar today → 1.88M baseline 2030; `figures/workers_at_risk.png`)
-- [x] ChatGPT natural experiment on IMSS: no displacement signal *yet* — exposed sectors grew faster post-2022 (+3.3%, p<.001). Read as the **policy window**, not safety: the realized form of automation in Jalisco is missing job growth over decades (H4), early effects hide inside sectors/entry-level hiring, and the window is confounded upward by the nearshoring FDI wave
+- [x] ChatGPT natural experiment on IMSS: no displacement signal *yet* — and no significant effect in either direction (positive point estimate +3.3%; permutation p = 0.26 with 8 sectors). Read as the **policy window**, not safety: the realized form of automation in Jalisco is missing job growth over decades (H4), early effects hide inside sectors/entry-level hiring, and the window is confounded upward by the nearshoring FDI wave
 - [x] Informality addressed: full-employment ENOE panel 2022–2024 (informal included) — total employment in exposed sectors did not fall and their informal share did not rise (no absorption signature); 908k at-risk workers are informal = zero safety net (severity multiplier)
 - [x] Nearshoring channel: Jalisco FDI +27% in 2021–2023 vs 2015–2019 (national share 5.5%→6.8%) — the capital that imports the robot frontier; justifies the accelerated r(t) scenario
 - [x] Wage-premium test: LLM exposure pays +23%/SD, but only for college-educated workers
