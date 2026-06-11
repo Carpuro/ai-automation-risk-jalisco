@@ -205,3 +205,4 @@ venv.bak/
 
 # pyenv
 .python-version
+data/raw/aei/*.csv
