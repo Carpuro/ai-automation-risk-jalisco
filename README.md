@@ -72,6 +72,12 @@ had no physical axis at all.
 - **Jalisco leans physical (H3 confirmed).** Employment-weighted (ENOE
   fac_tri, 88% coverage): DBOE −0.38 vs DEOE +0.09 — Jalisco's labor force is
   below-average in LLM exposure and above-average in robot exposure.
+- **The market substitutes where automation pays (H4 evidenced).** CE Jalisco
+  panel (19 sectors × 4 census transitions, 2003–2023): the *lagged* IRA
+  predicts faster capital deepening (β = +0.143, p = 0.019) and a falling
+  labor share (β = −0.040, p = 0.001) over the following census period.
+  Sectors both exposed and profitable-to-automate grew employment at +0.6%/yr
+  over 20 years vs +3.7%/yr where neither holds. `analysis/h4_adoption_test.py`.
 - **Level-1 model (non-circular).** Observed AI usage
   (`anthropic_observed_exposure`, Anthropic Economic Index) is zero-inflated
   (52% zeros), so a two-part hurdle model is used. Extensive margin: adding
