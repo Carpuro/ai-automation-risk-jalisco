@@ -1,94 +1,136 @@
 # Labor Automation Risk from AI in Jalisco, Mexico
 
-**Thesis — Maestría en Ciencias de los Datos**  
+**Thesis — Maestría en Ciencias de los Datos**
 Carlos Pulido Rosas · CUCEA, Universidad de Guadalajara · 2025–2026
 
 ---
 
 ## Research Question
 
-> *To what extent does specific exposure to large language models (LLMs) modify occupational automation risk beyond what the Frey-Osborne model predicts, and what economic incentive determines whether that substitution actually occurs in Jalisco's labor market?*
+> *How is AI automation risk distributed in Jalisco's labor market between the
+> cognitive frontier (large language models) and the embodied frontier (robots,
+> drones, autonomous machines) — and what determines which of the two dominates
+> for each occupation and sector?*
 
-This study moves beyond technical feasibility (Frey-Osborne, 2013) in two directions: (1) it incorporates LLM-specific exposure measures that invert the original model's assumptions about non-routine cognitive tasks, and (2) it introduces an economic incentive variable that determines whether automation is not just possible but profitable for firms — following the task-based framework of Acemoglu & Restrepo (2018).
+The study covers **all of AI, on two axes of equal weight**: cognitive AI
+(LLMs and perceptual AI) and embodied AI (robots, drones, autonomous vehicles,
+physical manipulation). It moves beyond Frey-Osborne (2013) in three ways:
+(1) it measures LLM-specific exposure with a dynamic index anchored in real
+benchmark capability curves; (2) it measures embodied exposure with a parallel
+index validated against real robot-patent exposure; and (3) it adds the
+economic incentive (Acemoglu & Restrepo, 2018) that determines whether
+technically feasible substitution is also profitable.
 
 ---
 
 ## Hypotheses
 
-1. LLM exposure significantly predicts automation risk for non-routine cognitive occupations, independent of the Frey-Osborne score (H1).
-2. The Automation Profitability Index (IRA: annual wage / automation cost proxy) moderates the relationship between technical risk and actual adoption (H2).
-3. Education level remains the strongest protective factor, but its effect is weaker for language-intensive occupations with high LLM exposure (H3).
-4. Agriculture and manufacturing retain the highest risk; white-collar clerical occupations show higher risk than Frey-Osborne predicted (H4).
+1. **H1 — Cognitive gradient.** LLM exposure follows the occupational
+   hierarchy: highest for managerial/professional occupations, lowest for
+   elementary/manual ones — inverting Frey-Osborne's assumption that
+   non-routine cognitive work is safe.
+2. **H2 — Bipolar structure.** Cognitive and embodied exposure are not two
+   independent risks but opposite poles of one dominant dimension: the
+   occupations most exposed to LLMs are the least exposed to robots, and vice
+   versa (Webb, 2020, confirmed with own indices).
+3. **H3 — Jalisco leans physical.** Jalisco's employment-weighted exposure
+   profile sits on the embodied pole (manufacturing, agriculture, transport):
+   below-average LLM exposure, above-average robot exposure.
+4. **H4 — Economic moderation.** The Automation Profitability Index
+   (IRA = annual wage / capital-cost proxy) moderates whether technical
+   exposure translates into real adoption pressure by sector.
 
 ---
 
-## Variable Structure
+## Own Indices (methodological contribution)
 
-### Block 1 — Worker profile (ENOE)
-`education`, `age`, `income (INGOCUP)`, `sector (SCIAN)`, `formality`, `firm size`, `urban/rural`
+| Index | Axis | Construction | Validation |
+|---|---|---|---|
+| **DBOE** — Dynamic LLM Occupational Exposure | Cognitive | Extends Felten's AIOE with yearly frontier-capability curves c_j(t) from Epoch AI benchmarks (3 LLM applications) | Reproduces published AIOE r = 0.94; tracks LM-AIOE r = 0.93 |
+| **DEOE** — Embodied Occupational Exposure | Physical | 5 O*NET physical subdomains (importance × level, mirror of DBOE weights), summary = PC1 (63% variance) | Webb robot-patent exposure r = +0.76; discriminant vs cognitive indices r ≈ 0 |
 
-### Block 2 — Task profile (O*NET, Phase 1)
-`routine_task_intensity (RTI)`, `frey_osborne_score`, `cognitive_demand`, `social_interaction`, `creativity`
+Builders: `data/raw/build_dynamic_aioe.py`, `data/raw/build_embodied_exposure.py`.
 
-### Block 3 — LLM exposure (Phase 2)
-`dboe` — **Dynamic LLM Occupational Exposure** (own contribution): extends Felten's AIOE with real Epoch AI benchmark scores per year. Validated against the published AIOE (r = 0.94). See `data/raw/build_dynamic_aioe.py`.  
-`gpt_exposure_score` — ILO WP140 task-level exposure (2023 + predicted 2025), crosswalked ISCO → SINCO  
-`moravec_index` — Arora et al. (2025), model-agnostic robustness check  
-`anthropic_observed_exposure` — Anthropic Economic Index, observed vs. theoretical  
-`rl_feasibility` — RL learnability index (2030 horizon)  
-`aioe` — AI Occupational Exposure Index, Felten et al. (2021), used as control  
-
-### Block 4 — Economic incentive
-`ira` — Automation Profitability Index: `annual_wage / capital_intensity_proxy`  
-Source: INGOCUP (ENOE) + fixed assets per worker (INEGI Censos Económicos 2019)
+A finding along the way: the indices previously treated as physical
+(Moravec auto_w, RL feasibility) are empirically **cognitive** (r = −0.66 with
+real physical work, r ≈ +0.75 with DBOE/AIOE) — without the DEOE the battery
+had no physical axis at all.
 
 ---
 
-## Methodology
+## Key Results So Far
 
-**Phase 1 (complete):** Frey-Osborne baseline with ENOE Jalisco data. Random Forest R² ≈ 0.75.  
-Key finding: agriculture at highest risk; education is the dominant protective factor (77–81% feature importance).
+- **Bipolar factor structure (H2 confirmed).** EFA over 8 de-duplicated
+  indices (N = 747 SOC): one dominant factor (57% variance) with cognitive
+  indices loading positive (DBOE +0.87) and embodied indices negative
+  (DEOE −0.87, Webb robot −0.82). `analysis/exposure_factor_structure.py`.
+- **Cognitive gradient (H1 confirmed).** DBOE by SINCO division descends
+  monotonically from Funcionarios/directores (+0.89) to occupations in the
+  elementary divisions (−1.2); DEOE mirrors it, peaking at machine operators
+  (+1.07) and agriculture (+0.72). Official INEGI SINCO↔SOC crosswalk,
+  `data/raw/build_sinco_exposure.py`.
+- **Jalisco leans physical (H3 confirmed).** Employment-weighted (ENOE
+  fac_tri, 88% coverage): DBOE −0.38 vs DEOE +0.09 — Jalisco's labor force is
+  below-average in LLM exposure and above-average in robot exposure.
+- **Level-1 model (non-circular).** Observed AI usage
+  (`anthropic_observed_exposure`, Anthropic Economic Index) is zero-inflated
+  (52% zeros), so a two-part hurdle model is used. Extensive margin: adding
+  DBOE lifts AUC 0.66 → 0.85 over Frey-Osborne (LR p ≈ 1e-48); DEOE adds
+  significantly with opposite sign. Intensive margin is dominated by DEOE
+  (β = −0.76). `analysis/level1_exposure_model.py`.
 
-**Phase 2 (in progress):** Add Blocks 3 and 4. Model specification:
+Both index magnitudes are kept in the risk model (decision: each occupation
+carries an AI risk *and* a robot risk); the bipolar axis is reported as a
+structural finding.
 
-```
-automation_risk = f(
-    Block 1: ENOE worker profile,
-    Block 2: O*NET task profile (Frey-Osborne baseline),
-    Block 3: LLM exposure (GPT score + LTII + AIOE),
-    Block 4: IRA economic incentive
-)
-```
+---
 
-**Statistical validation:**
-- Pearson vs. Spearman correlation — detect non-linearity before model selection
-- Ramsey RESET — test OLS functional form
-- VIF — multicollinearity between education, income, sector
-- Generalized Additive Models (GAM) — non-linear baseline for comparison
-- SHAP values — variable importance interpretation for Random Forest
-- Confirmatory Factor Analysis (CFA) — validate LLM exposure construct
+## Methodology — Two-Level Architecture
+
+**Level 1 — Occupation exposure model (N ≈ 678 SOC).** Hierarchical two-part
+(hurdle) model of observed AI usage: Frey-Osborne baseline → +DBOE → +DEOE,
+with likelihood-ratio / incremental F tests. The target is *observed* usage,
+not a constructed score, so the test is external and non-circular.
+
+**Level 2 — Jalisco sector projection (2025–2030).** Exposure aggregated to
+SINCO occupations (official INEGI crosswalk) and SCIAN sectors, interacted
+with the IRA economic incentive, anchored in IMSS formal-employment
+trajectories 2000–2024. Scenario projection driven by the capability curves
+(c_j(t) for LLMs; robotics capability curve pending) — **scenario analysis
+anchored in real data, not a trained forecaster** (no observed automation
+panel exists for Jalisco).
+
+Statistical validation: EFA/CFA for construct structure, Cronbach's alpha per
+DEOE subdomain, convergent/discriminant correlations, VIF, sensitivity checks
+(PC1 without weak subdomains, benchmark-mapping robustness).
+
+> **Note on naming:** DBOE is dynamic (yearly c_j(t) from benchmarks). The
+> embodied index is currently the **static core**; its dynamic layer (robot
+> cost / capability curve, IFR adoption density) is planned — until built, the
+> thesis presents it as "EOE static with proposed dynamic extension".
 
 ---
 
 ## Data Sources
 
-All sources below are downloaded and (except where noted) loaded into SQL Server.
-See [`docs/SQL_SERVER_SCHEMA.md`](docs/SQL_SERVER_SCHEMA.md) for the full DB inventory
-and [`data/DATA_INDEX.md`](data/DATA_INDEX.md) for source details.
+All sources below are downloaded and (except where noted) loaded into SQL
+Server. See [`docs/SQL_SERVER_SCHEMA.md`](docs/SQL_SERVER_SCHEMA.md) for the
+DB inventory and [`data/DATA_INDEX.md`](data/DATA_INDEX.md) for details.
 
 | Source | Content | Status |
 |---|---|---|
-| ENOE Q3 2024, ent=14 | Jalisco worker microdata (SDEMT 13,839 / COE1) | Loaded |
-| O*NET 28.3 | Occupation task/ability/context descriptors (detail) | Loaded |
-| ESCO ISCO ↔ SOC crosswalk | bridge SINCO → ISCO → SOC | Loaded |
-| ILO WP140 (2025) | task-level GenAI exposure (2023 + predicted 2025) | Loaded |
-| Felten et al. (2021) | AIOE by occupation | Loaded |
-| Arora et al. (2025) Moravec | model-agnostic exposure | Loaded |
-| Anthropic Economic Index | observed exposure by occupation | Loaded |
-| Epoch AI Capabilities | LLM benchmark scores (DBOE input) | Downloaded |
-| INEGI Censos Económicos 2024 | capital/labor by SCIAN + municipio (IRA) | Loaded |
-| INEGI PIBE 2003–2022 | sectoral GDP Jalisco | Downloaded |
-| IMSS (IIEG) 2000–2024 | formal employment by sector, monthly | Loaded |
+| ENOE Q3 2024, ent=14 | Jalisco worker microdata (SDEMT 13,839; 6,147 occupied with SINCO-4d) | Loaded |
+| O*NET 28.3 | Occupation descriptors (abilities, activities, context, tech skills) | Loaded |
+| INEGI SINCO↔SOC/CIUO comparative tables | Official 4-digit crosswalk (via `occupationcross`) | Loaded |
+| ESCO ISCO ↔ SOC crosswalk | Secondary bridge | Loaded |
+| Felten et al. (2021) AIOE | Cognitive exposure + Appendix D matrix (DBOE input) | Loaded |
+| Epoch AI Capabilities | LLM benchmark scores (DBOE c_j(t) input) | Loaded |
+| Webb (2020) / Comparison of Indices | Robot/software/AI patent exposure + Frey-Osborne, SML, Eloundou | Loaded |
+| Anthropic Economic Index | Observed AI usage by occupation (Level-1 target) | Loaded |
+| ILO WP140, Moravec, RL feasibility | Additional cognitive indices (battery) | Loaded |
+| INEGI Censos Económicos 2003–2023 | Capital/labor by SCIAN (IRA, longitudinal) | Loaded |
+| INEGI PIBE 2003–2024 | Sectoral GDP Jalisco | Downloaded |
+| IMSS (IIEG) 2000–2024 | Formal employment by sector, monthly | Loaded |
 | Latinobarómetro 2017–2023 | AI/robot job-displacement perception (Mexico) | Loaded |
 
 ---
@@ -98,64 +140,37 @@ and [`data/DATA_INDEX.md`](data/DATA_INDEX.md) for source details.
 ```
 ai-automation-risk-jalisco/
 ├── README.md
-├── environment.yml
-├── requirements.txt
+├── analysis/                  — statistical models (EFA, Level-1 hurdle)
 ├── data/
-│   ├── raw/            — ENOE, O*NET source files
-│   ├── mappings/       — SOC-SINCO crosswalk
-│   ├── processed/      — cleaned, joined datasets
-│   └── sample/         — sample for testing
-├── notebooks/
-│   └── automation_risk_analysis.ipynb
-├── src/
-│   ├── data_loader.py
-│   ├── data_preprocessing.py
-│   ├── feature_engineering.py
-│   ├── automation_analyzer.py
-│   ├── statistical_inference.py
-│   ├── visualizations.py
-│   └── main.py
-├── outputs/
-│   ├── models/
-│   ├── visualizations/
-│   └── reports/
-└── docs/
-    ├── METHODOLOGY.md
-    ├── DATA_SOURCES.md
-    └── ANALYSIS_GUIDE.md
-```
-
----
-
-## Setup
-
-```bash
-conda env create -f environment.yml
-conda activate ai_automation_thesis
-python verify_setup.py
-jupyter notebook notebooks/automation_risk_analysis.ipynb
+│   ├── raw/                   — sources + index builders (build_*.py, load_*.py)
+│   ├── processed/             — built indices (CSV)
+│   └── DATA_INDEX.md
+├── docs/
+│   ├── SQL_SERVER_SCHEMA.md   — live DB inventory
+│   └── DATA_SOURCES.md
+└── legacy/                    — superseded coursework demo (see legacy/README.md)
 ```
 
 ---
 
 ## Current Status
 
-_Last updated: 2026-05-30. DB inventory: [`docs/SQL_SERVER_SCHEMA.md`](docs/SQL_SERVER_SCHEMA.md)._
+_Last updated: 2026-06-10._
 
-- [x] Phase 1: Frey-Osborne baseline (Random Forest R² = 0.75)
-- [x] ENOE Jalisco data processed and loaded (SDEMT 13,839 / COE1 11,352)
-- [x] O*NET descriptors integrated (task ratings, work context, skills, abilities)
-- [x] SINCO → ISCO → SOC crosswalk (ESCO) built and loaded
-- [x] Data collection complete (ENOE, O*NET, INEGI CE2024/PIBE, IMSS, Latinobarómetro, Epoch)
-- [x] Block 3 indices loaded (AIOE, ILO WP140, Moravec, Anthropic, RL feasibility)
-- [x] **DBOE** dynamic LLM-exposure index built and validated (r = 0.94 vs published AIOE)
-- [x] DBOE / IMSS / Latinobarómetro loaded to SQL Server
-- [ ] Feed real DBOE into `ocupaciones_onet.gpt_exposure_score` (currently placeholder)
-- [ ] IRA economic incentive (Block 4) — recompute from CE2024 full file (Q000C/Q400A)
-- [ ] Phase 2 model M1→M4 (hierarchical, incremental F-test)
-- [ ] ENOE COE1 `digital_access` to be sourced from O*NET (p5f not collected in Q3 2024)
-- [ ] Statistical validation (RESET, VIF, GAM, SHAP, CFA)
-- [ ] Port core-table DDL from `mcd_cucea` into this repo for full reproducibility
+- [x] Data collection complete (ENOE, O*NET, INEGI, IMSS, Latinobarómetro, Epoch, index battery)
+- [x] **DBOE** built and validated (r = 0.94 vs published AIOE)
+- [x] **DEOE** built and validated (r = +0.76 vs Webb robot exposure)
+- [x] Moravec/RL reclassified as cognitive (empirical finding)
+- [x] EFA: bipolar cognitive↔physical structure (H2)
+- [x] Official SINCO↔SOC crosswalk; 88–89% of Jalisco workers with exposure attached
+- [x] SINCO division gradient with corrected official labels (H1)
+- [x] Jalisco employment-weighted exposure profile (H3)
+- [x] Level-1 hurdle model vs Frey-Osborne and published rivals
+- [ ] DEOE dynamic layer (robot capability/cost curve, IFR density)
+- [ ] Level-2 sector projection 2025–2030 (exposure × IRA, IMSS anchor)
+- [ ] Municipal automation-pressure map (CE2024, 126 municipios)
+- [ ] Perception chapter (Latinobarómetro, scale harmonization)
+- [ ] Port core-table DDL from `mcd_cucea` for full reproducibility
 
 ---
 
@@ -165,18 +180,20 @@ Acemoglu, D., & Restrepo, P. (2018). The race between man and machine. *American
 
 Eloundou, T., Manning, S., Mishkin, P., & Rock, D. (2023). GPTs are GPTs: An early look at the labor market impact potential of large language models. *arXiv:2303.10130*.
 
-Felten, E., Raj, M., & Seamans, R. (2023). How will language models use tool use, planning, and reasoning? *SSRN Working Paper*.
+Felten, E., Raj, M., & Seamans, R. (2021). Occupational, industry, and geographic exposure to artificial intelligence. *Strategic Management Journal*, 42(12), 2195–2217.
 
 Frey, C. B., & Osborne, M. A. (2017). The future of employment. *Technological Forecasting and Social Change*, 114, 254–280.
 
-Gmyrek, P., Berg, J., & Bescond, D. (2023). *Generative AI and jobs: A global analysis of potential effects on job quantity and quality*. ILO Working Paper 96.
+Gmyrek, P., Berg, J., & Bescond, D. (2023). *Generative AI and jobs*. ILO Working Paper 96.
 
-Nedelkoska, L., & Quintini, G. (2018). *Automation, skills use and training*. OECD Social, Employment and Migration Working Papers, No. 202.
+Handa, K., et al. (2025). *The Anthropic Economic Index*. Anthropic.
+
+Webb, M. (2020). *The impact of artificial intelligence on the labor market*. Stanford University working paper.
 
 ---
 
 ## Contact
 
-Carlos Pulido Rosas · carlos.pulido.rosas@gmail.com  
-CUCEA — Universidad de Guadalajara  
+Carlos Pulido Rosas · carlos.pulido.rosas@gmail.com
+CUCEA — Universidad de Guadalajara
 GitHub: [github.com/carpuro](https://github.com/carpuro)
