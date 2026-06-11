@@ -1,7 +1,20 @@
 # Data Index — ai_automation_risk_jalisco
 
 Base de datos SQL Server en homelab (localhost:1433 / Tailscale 100.64.0.11:1433).
-Última actualización: 2026-05-30.
+Última actualización: 2026-06-11.
+
+> **Dónde está la documentación viva:** el inventario real de la base
+> (~45 tablas) se mantiene en [`docs/SQL_SERVER_SCHEMA.md`](../docs/SQL_SERVER_SCHEMA.md);
+> el mapa script→tabla→resultado en [`analysis/README.md`](../analysis/README.md)
+> y [`data/raw/README.md`](raw/README.md). Este índice documenta las FUENTES.
+>
+> **Fuentes agregadas después del corte 2026-05-30** (detalles en los READMEs
+> de cada carpeta): tablas comparativas oficiales INEGI SINCO↔SOC/CIUO
+> (`raw/crosswalks/`), serie robótica IFR/OWID (`raw/robotics/`), Anthropic
+> Economic Index país×SOC (`raw/aei/`), IED por entidad y tipo — Secretaría
+> de Economía (`raw/nearshoring/`), microdatos ENOE trimestrales 2022T1–2024T3
+> (`raw/enoe/quarters/`, gitignored), `Comparison of Indices.csv` (Webb/
+> Frey-Osborne/SML/Eloundou) ya cargado como `external_index_comparison`.
 
 ---
 

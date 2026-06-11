@@ -171,14 +171,18 @@ DB inventory and [`data/DATA_INDEX.md`](data/DATA_INDEX.md) for details.
 ```
 ai-automation-risk-jalisco/
 ├── README.md
-├── analysis/                  — statistical models (EFA, Level-1 hurdle)
+├── analysis/                  — all statistical results; README = script map
+│                                (structure, Level-1, demand side, Level-2,
+│                                hardening: permutation/bounds/robustness)
 ├── data/
-│   ├── raw/                   — sources + index builders (build_*.py, load_*.py)
-│   ├── processed/             — built indices (CSV)
-│   └── DATA_INDEX.md
+│   ├── raw/                   — sources + builders; README = builder map + gotchas
+│   ├── processed/             — generated CSV mirrors of result tables
+│   └── DATA_INDEX.md          — source documentation
 ├── docs/
-│   ├── SQL_SERVER_SCHEMA.md   — live DB inventory
+│   ├── THEORETICAL_FRAMEWORK.md — the theory base; theory→hypothesis→artifact map
+│   ├── SQL_SERVER_SCHEMA.md     — live DB inventory (~45 tables)
 │   └── DATA_SOURCES.md
+├── figures/                   — thesis-ready figures; README = figure map
 └── legacy/                    — superseded coursework demo (see legacy/README.md)
 ```
 

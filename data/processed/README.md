@@ -1,155 +1,39 @@
-# Datos Procesados
+# data/processed — generated outputs (CSV mirrors of SQL Server tables)
 
-Este directorio contiene datos **transformados y limpios** listos para análisis.
+Everything here is **generated** — never edit by hand; rerun the producing
+script instead (see `analysis/README.md` and `data/raw/README.md` for the
+script map). The authoritative store is SQL Server
+(`ai_automation_risk_jalisco`, inventory in `docs/SQL_SERVER_SCHEMA.md`);
+these CSVs are convenience mirrors of selected result tables. Most are
+gitignored.
 
-## 📊 Archivos Generados
+## Index construction
 
-Los archivos aquí son **generados automáticamente** por los scripts de procesamiento.
+| File | Producer |
+|---|---|
+| `dynamic_aioe_scores.csv` (DBOE per SOC, 2022–2026 + z) | `build_dynamic_aioe.py` |
+| `sinco_dboe_scores.csv` (superseded — crude bridge, wrong labels) | `build_dynamic_aioe.py` |
+| `sinco_exposure_scores.csv` (DBOE+DEOE per SINCO division, official) | `build_sinco_exposure.py` |
+| `robot_capability_curve.csv` (r(t), 3 scenarios) | `build_robot_capability.py` |
+| `onet_scores.csv`, `isco4_onet_scores.csv`, `sinco_group_scores.csv`, `enoe_jalisco.csv` | legacy-era processing (`process_*.py`) |
 
-### Formato Parquet (Recomendado)
+## Results (analysis outputs)
 
-```
-data/processed/
-├── occupations_clean.parquet
-├── risk_analysis_results.parquet
-└── features_engineered.parquet
-```
-
-**Ventajas:**
-- Compresión eficiente
-- Lectura rápida en PySpark
-- Preserva tipos de datos
-- Columnar storage
-
-### Formato CSV (Para análisis externo)
-
-```
-data/processed/
-├── occupations_clean.csv
-├── risk_analysis_results.csv
-└── features_engineered.csv
-```
-
-**Uso:** Análisis en Excel, Tableau, Power BI
-
-## 🔄 Cómo se Generan
-
-### Opción 1: Pipeline Completo
-
-```bash
-python src/main.py --mode real \
-  --occupation-data data/raw/onet/Occupation_Data.txt \
-  --employment-data data/raw/enoe_jalisco.csv
-```
-
-### Opción 2: Notebook
-
-Ejecutar `notebooks/automation_risk_analysis.ipynb` hasta la sección de Feature Engineering.
-
-### Opción 3: Módulos Individuales
-
-```python
-from data_loader import load_onet_occupations, load_enoe_jalisco
-from data_preprocessing import preprocess_pipeline
-from feature_engineering import feature_engineering_pipeline
-
-# Cargar
-df_onet = load_onet_occupations(spark, 'data/raw/onet/Occupation_Data.txt')
-df_enoe = load_enoe_jalisco(spark, 'data/raw/enoe_jalisco.csv')
-
-# Integrar (simplificado)
-df = df_onet.join(df_enoe, how='inner')
-
-# Preprocesar
-df_clean = preprocess_pipeline(df)
-
-# Feature engineering
-df_features = feature_engineering_pipeline(df_clean)
-
-# Guardar
-df_features.to_spark().write.parquet('data/processed/occupations_clean.parquet')
-```
-
-## 📁 Estructura de Archivos
-
-### occupations_clean.parquet
-Dataset limpio después de preprocesamiento.
-
-**Transformaciones aplicadas:**
-- Valores faltantes manejados
-- Duplicados eliminados
-- Outliers filtrados (opcional)
-- Tipos de datos corregidos
-
-### features_engineered.parquet
-Dataset con features adicionales creados.
-
-**Features nuevos incluyen:**
-- `routine_index` - Índice de rutinización
-- `cognitive_demand` - Demanda cognitiva
-- `social_interaction` - Interacción social
-- `creativity` - Nivel de creatividad
-- `complexity_index` - Complejidad general
-- `automation_susceptibility` - Susceptibilidad a automatización
-- Features temporales (proyecciones 2025-2030)
-- Agregaciones por sector
-
-### risk_analysis_results.parquet
-Resultados completos del análisis de riesgo.
-
-**Columnas adicionales:**
-- `automation_risk` - Riesgo calculado (0-1)
-- `risk_category` - Alto/Medio/Bajo
-- `sector_avg_risk` - Riesgo promedio del sector
-- `risk_deviation_from_sector` - Desviación vs sector
-
-## 🚫 No Subir a Git
-
-Estos archivos **NO** deben subirse a Git porque:
-- Son grandes (>50MB)
-- Se pueden regenerar
-- Pueden contener datos sensibles
-
-Están incluidos en `.gitignore`.
-
-## ✅ Validación
-
-Para verificar integridad de archivos procesados:
-
-```python
-import pyspark.pandas as ps
-
-# Cargar
-df = ps.read_parquet('data/processed/risk_analysis_results.parquet')
-
-# Validar
-print(f"Filas: {len(df):,}")
-print(f"Columnas: {len(df.columns)}")
-print(f"Valores nulos: {df.isnull().sum().sum()}")
-
-# Verificar columnas clave
-required_cols = ['occupation_id', 'automation_risk', 'risk_category']
-for col in required_cols:
-    assert col in df.columns, f"Falta columna: {col}"
-
-print("✓ Dataset válido")
-```
-
-## 🔄 Regenerar Datos
-
-Si los archivos se corrompen o se pierden:
-
-```bash
-# Borrar archivos procesados
-rm -rf data/processed/*.parquet
-
-# Regenerar
-python src/main.py --mode real \
-  --occupation-data data/raw/onet/Occupation_Data.txt \
-  --employment-data data/raw/enoe_jalisco.csv
-```
-
----
-
-**Última actualización:** Noviembre 2025  
-**Generados por:** Pipeline de procesamiento PySpark
+| File | Producer |
+|---|---|
+| `sector_exposure_profile.csv`, `sector_pressure_projection.csv` | `level2_sector_projection.py` |
+| `workers_at_risk.csv` | `workers_at_risk.py` |
+| `worker_exposure_profile.csv` | `worker_profile.py` |
+| `informality_severity.csv` | `informality_severity.py` |
+| `municipal_exposure.csv` | `build_municipal_exposure.py` |
+| `state_exposure_comparison.csv` | `state_exposure_comparison.py` |
+| `enoe_jalisco_quarterly.csv` | `build_enoe_quarterly.py` |
+| `absorption_test.csv` | `absorption_informality.py` |
+| `h4_adoption_test.csv` | `h4_adoption_test.py` |
+| `chatgpt_event_imss.csv` | `chatgpt_event_imss.py` |
+| `wage_premium.csv` | `wage_premium.py` |
+| `reinstatement_emerging.csv` | `reinstatement_emerging_tasks.py` |
+| `perception_trend.csv` | `perception_latinobarometro.py` |
+| `aei_mexico_soc.csv` | `aei_mexico_validation.py` |
+| `nearshoring_fdi.csv` | `nearshoring_channel.py` |
+| `crosswalk_coverage_bounds.csv`, `permutation_inference.csv`, `robustness_*.csv` | hardening scripts |
