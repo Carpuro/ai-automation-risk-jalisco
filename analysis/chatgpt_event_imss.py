@@ -18,10 +18,27 @@ recovery, balanced ~22 pre / 24 post months); robustness window 2017-01+.
 Month FE absorb common shocks; identification is cross-sector. Only 9
 clusters -- HC1 SEs reported with that caveat; read effect sizes, not stars.
 
-Interpretation note: a NULL is a finding -- perceived displacement jumped
-+12.5pp (2020-2023, Latinobarometro) regardless of whether realized
-employment moved. Adoption lags (Brynjolfsson's J-curve) predict exactly
-this gap.
+INTERPRETATION -- "not yet" is not "safe" (the policy window):
+  * This test measures one narrow thing: the STOCK of FORMAL jobs at a
+    coarse 8-sector grain over ~24 months. Early displacement appears first
+    in hiring slowdowns, entry-level postings and within-job task
+    composition (US evidence: effects concentrate in entry-level workers
+    WITHIN exposed occupations, invisible in sector aggregates), and a
+    sector can grow while occupations inside it hollow out.
+  * The informality objection is tested and rejected separately
+    (absorption_informality.py): including the informal ~55%, total
+    employment in exposed sectors still did not fall, and their informal
+    share did not rise -- the null is not a formal-only artifact.
+  * Nearshoring confounder (nearshoring_channel.py): the post-2022 window
+    coincides with an FDI wave (+27% vs 2015-2019) that pushes formal
+    employment UP -- the positive coefficient partly reflects investment-
+    driven labor demand, not absence of automation pressure.
+  * Mexico's adoption is early (AEI: usage at 0.44x the expected level), and
+    H4 shows the realized form of automation here is MISSING JOB GROWTH over
+    decades (+0.6%/yr vs +3.7%/yr), which a 24-month event study cannot see.
+  Read with the perception result (+12.5pp expectation jump): the capability
+  shock arrived, the labor-market shock has not -- that lag is the policy
+  window, not evidence of safety.
 
 Outputs: table `chatgpt_event_imss` (+ CSV), figure
 figures/chatgpt_event_imss.png (employment indexed to 2022-10, high- vs
