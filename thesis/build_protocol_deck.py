@@ -13,7 +13,8 @@ from pathlib import Path
 from pptx import Presentation
 from pptx.util import Pt
 
-TEMPLATE = Path(r"C:\Users\carlo\Downloads\Protocolo de Investigación - Presentación (2).pptx")
+# Template archived in-repo (the Downloads copy is disposable)
+TEMPLATE = Path(__file__).resolve().parent / "plantilla_protocolo_cucea.pptx"
 OUT = Path(__file__).resolve().parent / "protocolo_avance_2026.pptx"
 
 TITLE = (
