@@ -144,6 +144,21 @@ Consolidación: dejar el server como fuente única antes de buscar el crosswalk 
 > **89% de trabajadores Jalisco (pond. fac_tri) con DBOE+DEOE**. Hallazgo: Jalisco
 > DBOE −0.38 (debajo en IA cognitiva), DEOE +0.09 (arriba en robots).
 
+## Tablas de la sesión 2026-06-10 (revisión + mejoras)
+| Tabla | Filas | Grano | Contenido |
+|---|---|---|---|
+| `sinco4_exposure_scores` | 371 | SINCO 4 díg | DBOE + DEOE por ocupación SINCO vía crosswalk oficial INEGI (broad SOC). `build_sinco_exposure.py` |
+| `sinco_exposure_scores` | 9 | división SINCO | DBOE + DEOE por división, media ocupacional (`*_occ`) y ponderada por trabajadores Jalisco fac_tri (`*_jal`, 87.6% cobertura). **Etiquetas oficiales SINCO 2011** — corrige el bug de labels desfasados del viejo `sinco_dboe_scores` (que queda SUPERADO: división "0" no existe; div 9 = elementales) |
+| `robot_capability_curve` | 31 | año × escenario | **Capa dinámica del DEOE**: r(t) = stock operacional mundial de robots (IFR vía OWID) indexado a 2022=1.00, espejo de la c_j(t) del DBOE. Histórico 2012–2024 + proyección 2025–2030 en 3 escenarios (CAGR 3 años 10.3% baseline; ½× conservador; 1.5× acelerado → r(2030) = 1.61/2.15/2.82). Incluye instalaciones México (IFR primario 2019–2024, fuentes en `data/raw/robotics/README.md`). `build_robot_capability.py` |
+
+> **Modelo Nivel-1 RESUELTO (2026-06-10, `analysis/level1_exposure_model.py`):**
+> target `anthropic_observed_exposure` está **inflado en ceros** (52% ceros) →
+> modelo hurdle de dos partes. Extensivo: AUC 0.66 (Frey-Osborne) → 0.849 (+DBOE)
+> → 0.857 (+DEOE, signo opuesto). Intensivo: DEOE domina (β=−0.76). Rivales:
+> eloundou_beta mejor individual (AUC .885); DBOE ≈ AIOE (r=.96 por construcción).
+> ⚠️ La col `felten` de `external_index_comparison` NO es el AIOE publicado
+> (r=0.26 vs `aioe_score`); usar `aioe_score` como rival AIOE.
+
 ### Integración DBOE → `ocupaciones_onet` (2026-05-31, `load_new_tables.py` §5)
 Se agregó la columna `dboe_2026_z` (exposición LLM real, validada r=0.94) a
 `ocupaciones_onet`, poblada por join SINCO. **No destructivo:** las columnas Block 3

@@ -104,10 +104,15 @@ Statistical validation: EFA/CFA for construct structure, Cronbach's alpha per
 DEOE subdomain, convergent/discriminant correlations, VIF, sensitivity checks
 (PC1 without weak subdomains, benchmark-mapping robustness).
 
-> **Note on naming:** DBOE is dynamic (yearly c_j(t) from benchmarks). The
-> embodied index is currently the **static core**; its dynamic layer (robot
-> cost / capability curve, IFR adoption density) is planned — until built, the
-> thesis presents it as "EOE static with proposed dynamic extension".
+> **Note on the two dynamic layers:** DBOE's dynamics come from benchmark
+> capability curves c_j(t) (Epoch AI). DEOE's dynamics come from the robotics
+> adoption curve r(t) — world operational stock of industrial robots (IFR via
+> OWID, 2012–2024) indexed to 2022, projected 2025–2030 under three scenarios,
+> with Mexico's own IFR installations series as the local anchor
+> (`data/raw/build_robot_capability.py`). No public benchmark series measures
+> robot *capability* the way Epoch measures LLMs, so the embodied curve is
+> adoption-based — cost-decline evidence (Graetz & Michaels, 2018) is cited as
+> supporting context.
 
 ---
 
@@ -166,7 +171,7 @@ _Last updated: 2026-06-10._
 - [x] SINCO division gradient with corrected official labels (H1)
 - [x] Jalisco employment-weighted exposure profile (H3)
 - [x] Level-1 hurdle model vs Frey-Osborne and published rivals
-- [ ] DEOE dynamic layer (robot capability/cost curve, IFR density)
+- [x] DEOE dynamic layer: r(t) world robot-stock curve (IFR/OWID) + Mexico installations, 3 scenarios 2025–2030
 - [ ] Level-2 sector projection 2025–2030 (exposure × IRA, IMSS anchor)
 - [ ] Municipal automation-pressure map (CE2024, 126 municipios)
 - [ ] Perception chapter (Latinobarómetro, scale harmonization)

@@ -1,0 +1,42 @@
+entity,code,year,robot_density
+Austria,AUT,2023,24.5
+Austria,AUT,2024,27.2
+Canada,CAN,2023,22.5
+Canada,CAN,2024,24.1
+China,CHN,2023,14.2
+China,CHN,2024,16.6
+Czechia,CZE,2023,20.7
+Czechia,CZE,2024,21.6
+Denmark,DNK,2023,30.6
+Denmark,DNK,2024,32.9
+Finland,FIN,2023,17.6
+Finland,FIN,2024,18.3
+France,FRA,2023,18.6
+France,FRA,2024,19.5
+Germany,DEU,2023,42.9
+Germany,DEU,2024,44.9
+Hungary,HUN,2024,17.2
+Italy,ITA,2023,22.8
+Italy,ITA,2024,23.7
+Japan,JPN,2023,41.9
+Japan,JPN,2024,44.6
+Netherlands,NLD,2023,26.4
+Netherlands,NLD,2024,29.3
+Singapore,SGP,2023,77
+Singapore,SGP,2024,81.8
+Slovakia,SVK,2023,20.1
+Slovakia,SVK,2024,21
+Slovenia,SVN,2023,30.6
+Slovenia,SVN,2024,31.5
+South Korea,KOR,2023,101.2
+South Korea,KOR,2024,122
+Spain,ESP,2023,17.4
+Spain,ESP,2024,18.3
+Sweden,SWE,2023,34.7
+Sweden,SWE,2024,37.7
+Switzerland,CHE,2023,30.2
+Switzerland,CHE,2024,29.4
+Taiwan,TWN,2023,29.4
+Taiwan,TWN,2024,30.2
+United States,USA,2023,29.5
+United States,USA,2024,30.7
