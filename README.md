@@ -173,7 +173,7 @@ _Last updated: 2026-06-10._
 - [x] Level-1 hurdle model vs Frey-Osborne and published rivals
 - [x] DEOE dynamic layer: r(t) world robot-stock curve (IFR/OWID) + Mexico installations, 3 scenarios 2025–2030
 - [x] Level-2 sector projection 2025–2030 (exposure × IRA moderation × technology curves, IMSS anchor; 3 scenarios)
-- [ ] Municipal automation-pressure map (CE2024, 126 municipios)
+- [x] Municipal automation-pressure map (125 municipios, CE2023 sector mix × exposure; `figures/`)
 - [ ] Perception chapter (Latinobarómetro, scale harmonization)
 - [ ] Port core-table DDL from `mcd_cucea` for full reproducibility
 
