@@ -113,6 +113,14 @@ LLM_APPLICATIONS = [
 
 # Mapping from each AIOE application to its Epoch benchmark files and the
 # score column to read. Scores are 0-1 unless noted in SCORE_SCALE.
+#
+# Justification for the "Abstract Strategy Games" mapping: Felten's
+# application is defined as strategic, rule-bound multi-step reasoning;
+# competition math (MATH-5, AIME, FrontierMath) and chess puzzles are the
+# closest measured LLM capabilities to that definition (no benchmark plays
+# Felten's literal board games). This is the most debatable proxy choice in
+# the index; treat it as a robustness target (re-run excluding chess_puzzles
+# to confirm the score is not driven by any single benchmark).
 BENCHMARK_MAP = {
     "Language Modeling": {
         "mmlu_external.csv": "EM",

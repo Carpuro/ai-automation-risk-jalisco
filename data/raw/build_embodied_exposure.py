@@ -19,6 +19,11 @@ Output: table `embodied_exposure_soc` (soc6 grain) + embodied_* columns merged
 into `model_exposure_soc`. Static core; Webb (2020) robot calibration and the
 robotics capability time-curve (dynamic layer) are added in later stages.
 
+Robustness (documented 2026-06-10): phys_routine is the weakest subdomain
+(alpha = 0.57, 2 items). Dropping it and recomputing PC1 over the remaining 4
+subdomains yields r = 0.987 with the full 5-subdomain PC1 (73.5% variance) --
+the summary index is insensitive to the weak subdomain.
+
 Run AFTER load_model_tables.py.
 """
 
