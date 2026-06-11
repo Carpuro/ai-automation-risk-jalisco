@@ -63,7 +63,10 @@ had no physical axis at all.
 - **Bipolar factor structure (H2 confirmed).** EFA over 8 de-duplicated
   indices (N = 747 SOC): one dominant factor (57% variance) with cognitive
   indices loading positive (DBOE +0.87) and embodied indices negative
-  (DEOE −0.87, Webb robot −0.82). `analysis/exposure_factor_structure.py`.
+  (DEOE −0.87, Webb robot −0.82). A CFA model comparison formalizes it: two
+  correlated axes beat a single common factor (ΔAIC +2277, LR p ≈ 0) with
+  φ(COG, EMB) = −0.67. `analysis/exposure_factor_structure.py`,
+  `analysis/exposure_cfa.py`.
 - **Cognitive gradient (H1 confirmed).** DBOE by SINCO division descends
   monotonically from Funcionarios/directores (+0.89) to occupations in the
   elementary divisions (−1.2); DEOE mirrors it, peaking at machine operators
@@ -187,6 +190,10 @@ _Last updated: 2026-06-10._
 - [x] Level-2 sector projection 2025–2030 (exposure × IRA moderation × technology curves, IMSS anchor; 3 scenarios)
 - [x] Municipal automation-pressure map (125 municipios, CE2023 sector mix × exposure; `figures/`)
 - [x] Perception analysis (Latinobarómetro 4 waves, scales harmonized from Stata labels; `figures/perception_trend.png`)
+- [x] H4 adoption test (CE panel 2003–2023: lagged IRA → capital deepening p=.019, labor share p=.001)
+- [x] Worker-profile chapter (education mirror gradient, gendered risk; `figures/worker_exposure_profile.png`)
+- [x] CFA model comparison (two correlated axes ≫ one factor, φ = −0.67)
+- [x] ENDUTIH checked: no AI-use module through the 2024 wave — no Mexican household AI-adoption measure exists yet (documented limitation; watch future waves)
 - [ ] Port core-table DDL from `mcd_cucea` for full reproducibility
 
 ---
