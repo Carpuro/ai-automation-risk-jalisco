@@ -207,3 +207,4 @@ venv.bak/
 .python-version
 data/raw/aei/*.csv
 data/raw/enoe/quarters/
+thesis/_tesis_combined.md
