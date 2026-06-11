@@ -100,6 +100,17 @@ structural finding.
 
 ---
 
+## Theoretical Base
+
+The framework — task-based economics, the displacement/reinstatement race
+and the profitability condition, Moravec's paradox as the theory of the two
+frontiers, the measurement lineage, adoption lags, and the developing-economy
+adaptations (informality, transplanted task content, nearshoring) — is
+consolidated in [`docs/THEORETICAL_FRAMEWORK.md`](docs/THEORETICAL_FRAMEWORK.md),
+including the full **theory → hypothesis → artifact → result** map.
+
+---
+
 ## Methodology — Two-Level Architecture
 
 **Level 1 — Occupation exposure model (N ≈ 678 SOC).** Hierarchical two-part
