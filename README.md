@@ -72,6 +72,12 @@ had no physical axis at all.
 - **Jalisco leans physical (H3 confirmed).** Employment-weighted (ENOE
   fac_tri, 88% coverage): DBOE −0.38 vs DEOE +0.09 — Jalisco's labor force is
   below-average in LLM exposure and above-average in robot exposure.
+- **Who holds the exposed jobs (worker profile).** Education produces a
+  perfect mirror gradient: LLM exposure rises monotonically with schooling
+  (−1.00 primaria → +0.50 superior) while robot exposure falls (+0.47 →
+  −0.54). Only the top income quintile has positive LLM exposure; risk is
+  gendered (women lean cognitive, men strongly embodied); informal and rural
+  workers sit on the robot pole. `analysis/worker_profile.py`.
 - **The market substitutes where automation pays (H4 evidenced).** CE Jalisco
   panel (19 sectors × 4 census transitions, 2003–2023): the *lagged* IRA
   predicts faster capital deepening (β = +0.143, p = 0.019) and a falling
