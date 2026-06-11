@@ -151,6 +151,15 @@ Consolidación: dejar el server como fuente única antes de buscar el crosswalk 
 | `sinco_exposure_scores` | 9 | división SINCO | DBOE + DEOE por división, media ocupacional (`*_occ`) y ponderada por trabajadores Jalisco fac_tri (`*_jal`, 87.6% cobertura). **Etiquetas oficiales SINCO 2011** — corrige el bug de labels desfasados del viejo `sinco_dboe_scores` (que queda SUPERADO: división "0" no existe; div 9 = elementales) |
 | `robot_capability_curve` | 31 | año × escenario | **Capa dinámica del DEOE**: r(t) = stock operacional mundial de robots (IFR vía OWID) indexado a 2022=1.00, espejo de la c_j(t) del DBOE. Histórico 2012–2024 + proyección 2025–2030 en 3 escenarios (CAGR 3 años 10.3% baseline; ½× conservador; 1.5× acelerado → r(2030) = 1.61/2.15/2.82). Incluye instalaciones México (IFR primario 2019–2024, fuentes en `data/raw/robotics/README.md`). `build_robot_capability.py` |
 
+| `sector_exposure_profile` | 20 | sector ENOE/SCIAN | DBOE+DEOE ponderados por empleo (fac_tri) por sector, + IRA 2023 + CAGR IMSS 10 años. Recode `scian` de ENOE validado contra rama_est2. `analysis/level2_sector_projection.py` |
+| `sector_pressure_projection` | 540 | sector × año × escenario | **Proyección Nivel-2 2025-2030**: presión = pct(exposición) × curva tecnológica (c(t) cognitiva / r(t) robótica, ambas re-basadas a 2024=1.00) × moderación IRA (H4). Hallazgo: curva cognitiva SATURA ~2028 (techo de benchmarks) mientras stock robótico sigue compuesto. `analysis/level2_sector_projection.py` |
+
+> **⚠️ FIX curva c_j(t) (2026-06-10):** la convención "benchmark no existe → frontera 0"
+> ahora se aplica POR benchmark (reindex antes de promediar) — antes los benchmarks
+> tardíos (GPQA, HLE) entraban a media serie y la curva agregada podía BAJAR
+> (imposible en una frontera). dboe_2026_z quedó idéntico (r=1.0); solo cambian
+> los años tempranos de la curva. `dynamic_aioe_scores` recargada.
+
 > **Modelo Nivel-1 RESUELTO (2026-06-10, `analysis/level1_exposure_model.py`):**
 > target `anthropic_observed_exposure` está **inflado en ceros** (52% ceros) →
 > modelo hurdle de dos partes. Extensivo: AUC 0.66 (Frey-Osborne) → 0.849 (+DBOE)
