@@ -34,9 +34,15 @@ We restrict to the three applications LLMs actually perform
 reasoning/math proxy). The remaining seven applications in the AIOE
 matrix are vision/audio/robotics modalities outside the LLM scope of
 this thesis and are excluded so the index measures LLM exposure cleanly.
-As reasoning/math capability catches up to language capability over
-2022-2026, occupations weighted toward mathematical reasoning gain
-relative exposure - the re-ranking is the temporal signal of interest.
+
+Temporal signal (measured, reported as a limitation): the 2022->2026
+re-ranking across occupations is minimal (Spearman ~0.998), because the
+three application capabilities grow roughly in parallel. The temporal
+signal of the index therefore lives in the LEVEL of the capability
+curve c_j(t) (e.g. reasoning 0.00 -> 0.79), which drives the absolute
+exposure trajectory used in the 2025-2030 projection -- NOT in
+occupational re-ranking. The cross-sectional score (dboe_2026_z) is the
+feature; c_j(t) is the dynamics.
 
 Outputs
 -------
@@ -71,8 +77,11 @@ ESCO_FILE = RAW_DIR / "ESCO_to_ONET_SOC_crosswalk.xlsx"
 OUTPUT_FILE = PROCESSED_DIR / "dynamic_aioe_scores.csv"
 SINCO_OUTPUT_FILE = PROCESSED_DIR / "sinco_dboe_scores.csv"
 
-# SINCO major -> ISCO-08 major bridge, identical to build_crosswalk.py so
-# the DBOE aggregation matches the SINCO groups already loaded in the DB.
+# DEPRECATED: this crude first-digit SINCO->ISCO bridge (and the labels
+# below, which are shifted from division 3 onward and include a
+# non-existent division "0") is superseded by build_sinco_exposure.py,
+# which uses the official INEGI 4-digit comparative tables
+# (crosswalk_sinco_soc). Kept only so old outputs can be reproduced.
 SINCO_TO_ISCO = {
     "1": "1", "2": "2", "3": "3", "4": "4", "5": "5",
     "6": "5", "7": "6", "8": "7", "9": "8", "0": "9",
