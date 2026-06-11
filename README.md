@@ -194,6 +194,11 @@ _Last updated: 2026-06-10._
 - [x] Worker-profile chapter (education mirror gradient, gendered risk; `figures/worker_exposure_profile.png`)
 - [x] CFA model comparison (two correlated axes ≫ one factor, φ = −0.67)
 - [x] ENDUTIH checked: no AI-use module through the 2024 wave — no Mexican household AI-adoption measure exists yet (documented limitation; watch future waves)
+- [x] Workers-at-risk headline numbers (1.10M above the high-pressure bar today → 1.88M baseline 2030; `figures/workers_at_risk.png`)
+- [x] ChatGPT natural experiment on IMSS: no displacement signal — cognitively exposed sectors grew *faster* post-2022 (+3.3%, p<.001)
+- [x] Wage-premium test: LLM exposure pays +23%/SD, but only for college-educated workers
+- [x] Reinstatement check (O*NET emerging tasks): task renewal tilts cognitive; robot-exposed occupations static (descriptive, n.s.)
+- [x] AEI Mexico validation: Mexican Claude usage profile tracks the US-derived target (r = 0.97) — target defended, gaps documented
 - [ ] Port core-table DDL from `mcd_cucea` for full reproducibility
 
 ---
