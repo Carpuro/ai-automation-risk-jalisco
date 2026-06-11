@@ -245,22 +245,29 @@ def load_application_capabilities() -> pd.DataFrame:
 
     # Frontier (max) score per benchmark among models released up to each
     # year-end, then average across the benchmarks of the application.
+    #
+    # The frontier is a cumulative max, so it must be monotone in t. The
+    # "benchmark did not yet exist -> frontier 0" convention is applied PER
+    # BENCHMARK (reindex before averaging): a benchmark whose first scored
+    # model appears in year y contributes 0 to its application's mean for
+    # years < y. Without this, late-arriving hard benchmarks (GPQA, HLE)
+    # enter the mean mid-series and the aggregate curve can dip -- an
+    # impossible decline in frontier capability (bug fixed 2026-06-10).
+    all_pairs = pd.MultiIndex.from_frame(
+        obs[["app", "benchmark"]].drop_duplicates())
     records = {}
     for year in YEARS:
         cutoff = pd.Timestamp(f"{year}-12-31")
         up_to = obs[obs["date"] <= cutoff]
-        frontier = up_to.groupby(["app", "benchmark"])["score"].max()
-        app_cap = frontier.groupby("app").mean()
-        records[year] = app_cap
+        frontier = (up_to.groupby(["app", "benchmark"])["score"].max()
+                    .reindex(all_pairs).fillna(0.0))
+        records[year] = frontier.groupby("app").mean()
 
     capabilities = pd.DataFrame(records).reindex(LLM_APPLICATIONS)
 
-    # A year with no released benchmark (e.g. frontier-math/AIME before
-    # 2023) means frontier models scored ~0 on that capability; treat as 0.
-    if capabilities.isna().any().any():
-        log("Filling missing early-year capabilities with 0 "
-            "(benchmark did not yet exist; frontier score ~0).")
-        capabilities = capabilities.fillna(0.0)
+    mono = (capabilities.diff(axis=1).iloc[:, 1:] >= -1e-12).all().all()
+    if not mono:
+        log("WARNING: capability curve is not monotone - check benchmark data.")
 
     log("Frontier application capability by year:")
     for app in LLM_APPLICATIONS:
